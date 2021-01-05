@@ -102,7 +102,7 @@ for i = 1:numel(files)
     
     imwrite3D(im, fullfile(output_folder, files(i).name), [], 1);
     
-    textprogressbar(bytes(i)/sum([files.bytes])*100);
+    textprogressbar(bytes(i)/bytes(end)*100);
     updateWaitbar(handles, i/numel(files))
     
     if checkCancelButton(handles)

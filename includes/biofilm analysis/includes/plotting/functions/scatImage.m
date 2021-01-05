@@ -63,23 +63,25 @@ scat_im = imfilter(scat_im,G,'same');
 
 C = zeros(1, numel(x));
 
-for i = 1:numel(x)
-    if strcmp(xScale, 'linear')
-        xC = round((x(i)-xLimits(1))/(xLimits(2)-xLimits(1))*Nbins*4);
-    else
-        xC = round((log10(x(i)/xLimits(1)))/(log10(xLimits(2)/xLimits(1)))*Nbins*4);
-    end
-    
-    if strcmp(yScale, 'linear')
-        yC = round((y(i)-yLimits(1))/(yLimits(2)-yLimits(1))*Nbins*4);
-    else
-        yC = round((log10(y(i)/yLimits(1)))/(log10(yLimits(2)/yLimits(1)))*Nbins*4);
-    end
-           
-    try
-        C(i) = scat_im(xC, yC);
-    end
+
+if strcmp(xScale, 'linear')
+    xC = round((x-xLimits(1))/(xLimits(2)-xLimits(1))*Nbins*4);
+else
+    xC = round((log10(x/xLimits(1)))/(log10(xLimits(2)/xLimits(1)))*Nbins*4);
 end
+
+if strcmp(yScale, 'linear')
+    yC = round((y-yLimits(1))/(yLimits(2)-yLimits(1))*Nbins*4);
+else
+    yC = round((log10(y/yLimits(1)))/(log10(yLimits(2)/yLimits(1)))*Nbins*4);
+end
+
+isValid = xC > 0 & yC > 0 & ...
+          ~isinf(xC) & ~isinf(yC) & ...
+          xC <= size(scat_im, 1) & yC <= size(scat_im, 2);
+
+C(isValid) = scat_im(sub2ind(size(scat_im), xC(isValid), yC(isValid)));
+
 
 if plotContourLines
     [~, M] = contour(scat_im', 10, 'EdgeColor', 'black');

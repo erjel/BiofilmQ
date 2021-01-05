@@ -34,17 +34,17 @@ function [objects, obj] = calculateAutocorrelation(objects, filename, handles, o
         correlationLength2D = 2*returnCorrelationLength(rVec, autocorr2D_mean);
         correlationLength2D_Substrate = 2*returnCorrelationLength(rVec, autocorr2D_substrate);
         
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_CorrelationFcn_ch%d', ch_task(1))).rVec = rVec(1:end-1)';
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_CorrelationFcn_ch%d', ch_task(1))).autocorr3D_mean = autocorr3D_mean;
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_CorrelationFcn_ch%d', ch_task(1))).autocorr2D_mean = autocorr2D_mean;
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_CorrelationFcn_ch%d', ch_task(1))).autocorr2D_substrate = autocorr2D_substrate;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_CorrelationFcn_ch%d', ch_task(1))).rVec = rVec(1:end-1)';
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_CorrelationFcn_ch%d', ch_task(1))).autocorr3D_mean = autocorr3D_mean;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_CorrelationFcn_ch%d', ch_task(1))).autocorr2D_mean = autocorr2D_mean;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_CorrelationFcn_ch%d', ch_task(1))).autocorr2D_substrate = autocorr2D_substrate;
         
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_CorrelationLength2D_ch%d', ch_task(1))) = correlationLength2D;
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_CorrelationLength2D_Subtrate_ch%d', ch_task(1))) = correlationLength2D_Substrate;
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_CorrelationLength3D_ch%d', ch_task(1))) = correlationLength3D;
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_Zero3D_ch%d', ch_task(1))) = zero3D;
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_Zero2D_ch%d', ch_task(1))) = zero2D;
-        objects.globalMeasurements.(sprintf('Correlation_AutoCorrelation_Zero2D_Substrate_ch%d', ch_task(1))) = zero2D_Substrate;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_CorrelationLength2D_ch%d', ch_task(1))) = correlationLength2D;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_CorrelationLength2D_Substrate_ch%d', ch_task(1))) = correlationLength2D_Substrate;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_CorrelationLength3D_ch%d', ch_task(1))) = correlationLength3D;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_Zero3D_ch%d', ch_task(1))) = zero3D;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_Zero2D_ch%d', ch_task(1))) = zero2D;
+        objects.globalMeasurements.(sprintf('Biofilm_AutoCorrelation_Zero2D_Substrate_ch%d', ch_task(1))) = zero2D_Substrate;
 end
 
 

@@ -18,9 +18,10 @@
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 %%
-function img1raw = performImageAlignment3D(img1raw, metadata, silent)
+function img1raw = performImageAlignment3D(img1raw, metadata, method, silent)
 if nargin == 2
     silent = 0;
+    method = 'linear';
 end
 
 tform = metadata.data.registration;
@@ -41,7 +42,7 @@ if addZSlices > 1
     img1raw(:,:,end+1) = img1raw(:,:,end);
 end
  
-img1raw  = imwarp(img1raw,tform,'OutputView',imref3d(size(img1raw)), 'Interp', 'linear', 'FillValues', double(min(img1raw(:))));
+img1raw  = imwarp(img1raw,tform,'OutputView',imref3d(size(img1raw)), 'Interp', method, 'FillValues', double(min(img1raw(:))));
 
 if ~silent
     ticValue = displayTime(ticValue);

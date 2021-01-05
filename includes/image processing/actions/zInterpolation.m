@@ -35,7 +35,7 @@ if size(img_normalized, 3) == 1
 end
 
 if dz == dxy
-    fprintf(' -> skipped (scaling along xy and z is already equal)');
+    fprintf(' -> skipped (scaling along xy and z is already equal)\n');
     img_normalized_resized = img_normalized;
     return;
 end

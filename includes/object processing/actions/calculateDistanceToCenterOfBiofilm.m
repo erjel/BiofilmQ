@@ -43,16 +43,16 @@ toUm = @(voxel, scaling) voxel.*scaling/1000;
 
 fhypot = @(a,b,c) sqrt(abs(a).^2+abs(b).^2+abs(c).^2);
 
-distanceToCenterOfMass = fhypot(CM(1)-x, CM(2)-y, CM(3)-z);
+distanceToCenter = fhypot(CM(1)-x, CM(2)-y, CM(3)-z);
 distanceToCenterOfBiofilm = fhypot(CM(1)-x, CM(2)-y, min(z)-z);
 
-distanceToCenterOfMass = num2cell(toUm(distanceToCenterOfMass, objects.params.scaling_dxy));
+distanceToCenter = num2cell(toUm(distanceToCenter, objects.params.scaling_dxy));
 distanceToCenterOfBiofilm = num2cell(toUm(distanceToCenterOfBiofilm, objects.params.scaling_dxy));
 
-distanceToCenterOfMass(~goodObjects) = {NaN};
+distanceToCenter(~goodObjects) = {NaN};
 distanceToCenterOfBiofilm(~goodObjects) = {NaN};
 
-[objects.stats.Distance_ToBiofilmCenterOfMass] = distanceToCenterOfMass{:};
+[objects.stats.Distance_ToBiofilmCenter] = distanceToCenter{:};
 [objects.stats.Distance_ToBiofilmCenterAtSubstrate] = distanceToCenterOfBiofilm{:};
 
 fprintf('   - CM: [x=%.02f, y=%.02f, z=%.02f]', CM(1), CM(2), CM(3));

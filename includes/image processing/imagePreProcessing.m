@@ -97,12 +97,18 @@ if isfield(params, 'invertStack')
     end
 end
 
+if params.declumpingMethod~=3
+   method = 'linear'; 
+else
+    method = 'nearest';
+end
+
 if params.imageRegistration
     try
         if size(img1raw, 3) == 1
-            img1raw = performImageAlignment2D(img1raw, metadata, silent);
+            img1raw = performImageAlignment2D(img1raw, metadata, method, silent);
         else
-            img1raw = performImageAlignment3D(img1raw, metadata, silent);
+            img1raw = performImageAlignment3D(img1raw, metadata, method, silent);
         end
     catch
         disp(['Image #',num2str(f),' is not registered!']);
@@ -201,11 +207,12 @@ if ~silent
     updateWaitbar(handles, (f+0.2-range(1))/(1+range(end)-range(1)));
 end
 
-[imgfilter, params] = resizingAndDenoising(img1raw, metadata, params, silent);
 
-if params.topHatFiltering
-    
-    imgfilter = topHatFilter(imgfilter, params);
+
+if params.declumpingMethod~=3
+    [imgfilter, params] = resizingAndDenoising(img1raw, metadata, params, silent);
+else
+    imgfilter = zInterpolation_nearest(img1raw, metadata.data.scaling.dxy, metadata.data.scaling.dz, params, silent);
 end
 
 if params.speedUpSSD

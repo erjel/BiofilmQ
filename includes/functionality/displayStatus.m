@@ -75,9 +75,8 @@ end
 end
 
 function boolean = nonHtmlLongerThanLimit(str, limit)
-closeHtml = strfind(str, '>');
-openHtml = [strfind(str, '<'), length(str)];
-boolean = sum(openHtml(2:end) -closeHtml) > limit;
+nonHTMLstr = regexprep(str, '<.*?>', '');
+boolean = length(nonHTMLstr) > limit;
 end
 
 

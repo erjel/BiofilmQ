@@ -165,7 +165,7 @@ function [img_processed, background, img_raw, tryParentLink, params, metadata] .
             end
 
             
-            if params.removeBottomSlices && params.removeBottomSlices < imSize(3)
+            if params.removeBottomSlices && params.removeBottomSlices < size(img_processed{ch}, 3)
                 img_processed{ch}(:,:,1:params.removeBottomSlices) = [];
             end
         else

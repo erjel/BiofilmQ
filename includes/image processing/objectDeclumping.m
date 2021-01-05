@@ -46,6 +46,11 @@ switch params.declumpingMethod
     
    [objects, imgfilter, ImageContentFrame] = objectDeclumping_none( ...
        handles, params, imgfilter_edge_filled, imgfilter, prevData);
+   
+    case 3
+    
+   [objects, imgfilter, ImageContentFrame] = objectDeclumping_labels( ...
+       handles, params, imgfilter_edge_filled, imgfilter, prevData);
 
     
     otherwise

@@ -90,12 +90,10 @@ for i=0:numel(files)-1
     fileCounter = fileCounter + 1;
     
 end
-batchFile = batchFile';
+batchFile = cellfun(@(x) [x, newline], batchFile, 'UniformOutput', false);
 fileName = ['batch_deconvolution_',datestr(clock, 'yyyy-mm-dd_HH-MM'), '_(',num2str(numel(files)),' files).hgsb'];
 fileID = fopen(fullfile(output_dir, fileName), 'w');
-for i=1:size(batchFile,1)
-    fprintf(fileID, [batchFile{i}, '\n']);
-end
+fprintf(fileID, '%s', batchFile{:});
 fclose(fileID);
 
 fprintf('      - batch-file for Huygens Essential created [%s], containing %d images', fullfile(output_dir, fileName), numel(files));

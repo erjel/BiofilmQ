@@ -38,10 +38,14 @@ centerCoord_z = centerCoord(3:3:end);
 
 [pillars, pID] = unique([centerCoord_x', centerCoord_y'], 'rows');
 
-outline = bwperim(labelmatrix(objects)>0);
+matrix_extended = zeros(objects.ImageSize(1)+2, objects.ImageSize(2)+2, objects.ImageSize(3)+2);
+matrix_extended(2:end-1,2:end-1,2:end-1) = labelmatrix(objects)>0;
+outline = bwperim(matrix_extended);
+outline = outline(2:end-1,2:end-1,2:end-1);
 
 surface_perSubstrate = zeros(numel(objects.stats), 1);
 surface = zeros(numel(objects.stats), 1);
+surface_noBottom = surface;
 roughness = zeros(numel(objects.stats), 1);
 roughness_L1 = zeros(numel(objects.stats),1);
 thickness = zeros(numel(objects.stats),1);
@@ -80,6 +84,11 @@ for i = 1:numel(pID)
        
     surface(i) = sum(pillarImage_surface(:));
     
+    
+    surface_plane = sum(pillarImage_surface,3) ;
+    surface_plane = arrayfun(@(x) max([x>0, x-1]), surface_plane(:));
+    surface_noBottom(i) = sum(surface_plane);
+    
     pillarImage_surface = sum(pillarImage_surface(:))/(size(pillarImage, 1)*size(pillarImage, 2));
     
     surface_perSubstrate(singlePillar) = repmat(pillarImage_surface, numel(singlePillar), 1);
@@ -106,18 +115,20 @@ surface_perSubstrate = num2cell(surface_perSubstrate);
 
 
 toUm = @(voxel, scaling) voxel.*(scaling/1000);
+toUm2 = @(voxel, scaling) voxel.*(scaling/1000)^2;
 
 thickness = num2cell(toUm(thickness, objects.params.scaling_dxy));
 [objects.stats.Surface_LocalThickness] = thickness{:};
 
 thickness_single = toUm(thickness_single, objects.params.scaling_dxy);
-meanThickness = mean(thickness_single);
-globalRoughness = std(thickness_single); 
-globalRoughness_L1 = 1/(numel(thickness_single)*meanThickness)*sum(abs(meanThickness-thickness_single));
+meanThickness = nanmean(thickness_single);
+globalRoughness = nanstd(thickness_single); 
+globalRoughness_L1 = 1/(numel(thickness_single)*meanThickness)*nansum(abs(meanThickness-thickness_single));
 objects.globalMeasurements.Biofilm_MeanThickness = meanThickness;
 objects.globalMeasurements.Biofilm_Roughness = globalRoughness_L1;
 
-objects.globalMeasurements.Biofilm_OuterSurface = sum(surface);
+objects.globalMeasurements.Biofilm_OuterSurface = toUm2(nansum(surface),objects.params.scaling_dxy);
+objects.globalMeasurements.Biofilm_OuterSurface_ignoreSubstrate = toUm2(nansum(surface_noBottom),objects.params.scaling_dxy);
 
 fprintf('   - other surface properties');
 displayTime(ticValue);

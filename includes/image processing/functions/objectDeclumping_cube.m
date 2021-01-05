@@ -86,6 +86,14 @@ disp(' - step 2: finding connected components');
         return;
     end
 
+    
+    
+    fprintf(' - step 4: remove small objects\n');
+    if params.removeVoxels
+        w = bwareaopen(w, params.removeVoxelsOfSize); 
+    end
+    
+    
     objects = cubeSegmentation(w, params.gridSpacing,imgfilter);
     
     

@@ -86,7 +86,7 @@ try
         fprintf(', calculate local densities\n');
         h = ProgressBar(round(N/100));
         
-        for i = 1:N
+        parfor i = 1:N
             if ~mod(i, 100)
                 h.progress;
             end

@@ -59,15 +59,15 @@ directory = fullfile(handles.settings.directory, 'data', 'evaluation');
 
 field_xaxis = get(handles.handles_analysis.uicontrols.edit.edit_kymograph_xaxis, 'String');
 field_yaxis = get(handles.handles_analysis.uicontrols.edit.edit_kymograph_yaxis, 'String');
-field_zaxis = get(handles.handles_analysis.uicontrols.edit.edit_kymograph_coloraxis, 'String');
+field_caxis = get(handles.handles_analysis.uicontrols.edit.edit_kymograph_coloraxis, 'String');
 yOffset = str2num(get(handles.handles_analysis.uicontrols.edit.edit_yOffset, 'String'));
 
 
-normalizeByBiomass = false;
+normalizeByBiovolume = false;
 switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_averaging, 'Value')
     case 1
-        averagingMethod = ' normalized by biomass';
-        normalizeByBiomass = true;
+        averagingMethod = ' normalized by biovolume';
+        normalizeByBiovolume = true;
         averagingFcn = '';
     case 2
         averagingMethod = '';
@@ -86,7 +86,7 @@ switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_averaging, 'V
         averagingFcn = 'nanmax';
 end
 
-filename = [field_xaxis, ' vs ', field_yaxis, ' vs ', field_zaxis, averagingMethod];
+filename = [field_xaxis, ' vs ', field_yaxis, ' vs ', field_caxis, averagingMethod];
 if invertHeatmap
     filename = [filename, ' inverted'];
 end
@@ -105,41 +105,28 @@ end
 
 
 if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoColorRange, 'Value')
-    [zLabel, zUnit, zRange] = returnUnitLabel(field_zaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodColor, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeColor, 'Value'));
-    set(handles.handles_analysis.uicontrols.edit.edit_colorRange, 'String', num2str(zRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_colorLabel, 'String', zLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_colorLabel_unit, 'String', zUnit);
+    [~, ~, cRange] = returnUnitLabel(field_caxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodColor, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeColor, 'Value'));
+    set(handles.handles_analysis.uicontrols.edit.edit_colorRange, 'String', num2str(cRange, '%.2g %.2g'));
 else
-    zRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_colorRange, 'String'));
+    cRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_colorRange, 'String'));
 end
 if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoYRange, 'Value')
-    [yLabel, yUnit, yRange] = returnUnitLabel(field_yaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodY, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY, 'Value'));
+    [~, ~, yRange] = returnUnitLabel(field_yaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodY, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY, 'Value'));
     set(handles.handles_analysis.uicontrols.edit.edit_yRange, 'String', num2str(yRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String', yLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_yLabel_unit, 'String', yUnit);
 else
     yRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_yRange, 'String'));
 end
 if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoXRange, 'Value')
-    [xLabel, xUnit, xRange] = returnUnitLabel(field_xaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodX, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX, 'Value'));
+    [~, ~, xRange] = returnUnitLabel(field_xaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodX, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX, 'Value'));
     set(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String', num2str(xRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String', xLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String', xUnit);
 else
     xRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String'));
-    xUnit = get(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String');
-    xLabel = get(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String');
 end
 
-if ~isempty(get(handles.handles_analysis.uicontrols.edit.edit_colorLabel, 'String'))
-    zLabel = get(handles.handles_analysis.uicontrols.edit.edit_colorLabel, 'String');
-    zUnit = get(handles.handles_analysis.uicontrols.edit.edit_colorLabel_unit, 'String');
-end
 
-if ~isempty(get(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String'))
-    yLabel = get(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String');
-    yUnit = get(handles.handles_analysis.uicontrols.edit.edit_yLabel_unit, 'String');
-end
+[xLabel, yLabel, ~, cLabel] = getLabelsFromGUI(handles, {field_xaxis, field_yaxis, '', field_caxis});
+[xUnit, yUnit, ~, cUnit] = getUnitsFromGUI(handles, {field_xaxis, field_yaxis, '', field_caxis});
+
 
 publication = true;
 
@@ -189,7 +176,7 @@ removeZOffset = get(handles.handles_analysis.uicontrols.checkbox.checkbox_remove
     'database',     database,...
     'fieldX',       field_xaxis,...
     'fieldY',       field_yaxis,...
-    'fieldZ',       field_zaxis,...
+    'fieldZ',       field_caxis,...
     'rangeX',       xRange,...
     'rangeY',       yRange,...
     'scaleX',       scaleX,...
@@ -205,7 +192,7 @@ removeZOffset = get(handles.handles_analysis.uicontrols.checkbox.checkbox_remove
     'averagingFcn', averagingFcn,...
     'filterExpr', filterExp,...
     'clusterBiofilm', clusterBiofilm,...
-    'normalizeByBiomass', normalizeByBiomass);
+    'normalizeByBiovolume', normalizeByBiovolume);
 
 
 if get(handles.handles_analysis.uicontrols.checkbox.checkbox_removeZOffsetHeatmapColumn, 'Value')
@@ -276,7 +263,7 @@ view(h_ax, 0,90)
 
 if strcmp(averagingFcn, 'nanmean') || strcmp(averagingFcn, 'nanmedian') || strcmp(averagingFcn, '')
     try
-        h_ax.CLim = [zRange(1) zRange(2)];
+        h_ax.CLim = [cRange(1) cRange(2)];
     end
 end
 try
@@ -303,10 +290,10 @@ set(h_ax, 'NextPlot', 'add');
 
 
 c = colorbar;
-if strcmp(zUnit, '')
-    c.Label.String = zLabel;
+if strcmp(cUnit, '')
+    c.Label.String = cLabel;
 else
-    c.Label.String = [zLabel, ' ', zUnit];
+    c.Label.String = [cLabel, ' ', cUnit];
 end
 
 if strcmp(field_xaxis, 'Cell_Number') && strcmp(scaleX, 'log')
@@ -348,11 +335,7 @@ grid(h_ax, 'off');
 
 savefig(h, fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.fig']));
 
-if isunix
-    print(h, '-depsc', '-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.eps']));
-else
-    print(h, '-depsc ','-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.eps']));
-end
+print(h, '-depsc', '-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.eps']));
 
 pos = get(h_ax, 'Position');
 set(h_ax, 'Position', [pos(1)+.05 pos(2)+.05 pos(3)*0.8, pos(4)*0.9]);

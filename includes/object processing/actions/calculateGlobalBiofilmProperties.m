@@ -136,6 +136,8 @@ objects.globalMeasurements.Biofilm_VolumePerSubstrate = objects.globalMeasuremen
 if isfield(objects.globalMeasurements, 'Biofilm_OuterSurface')
     objects.globalMeasurements.Biofilm_OuterSurfacePerSubstrate = objects.globalMeasurements.Biofilm_OuterSurface/globalSubstrateArea;
     objects.globalMeasurements.Biofilm_OuterSurfacePerVolume = objects.globalMeasurements.Biofilm_OuterSurface/objects.globalMeasurements.Biofilm_Volume;
+    objects.globalMeasurements.Biofilm_OuterSurfaceIgnoreSubstratePerSubstrate = objects.globalMeasurements.Biofilm_OuterSurface_ignoreSubstrate/globalSubstrateArea;
+    objects.globalMeasurements.Biofilm_OuterSurfaceIgnoreSubstratePerVolume = objects.globalMeasurements.Biofilm_OuterSurface_ignoreSubstrate/objects.globalMeasurements.Biofilm_Volume;
 else
     fprintf('global measurement "surface" is missing -> assign "nan" to "surfacePerSubstrat" & "surfacePerSubstrat"!')
     objects.globalMeasurements.Biofilm_OuterSurfacePerSubstrate = nan;

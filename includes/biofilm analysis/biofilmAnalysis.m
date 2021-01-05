@@ -425,7 +425,7 @@ if field == 1
     switch lower(fieldName)
         case 'Distance_ToBiofilmCenterAtSubstrate'
             handles.handles_analysis.uicontrols.checkbox.checkbox_overlayBiofilmRadiusAsLine.Enable = 'on';
-        case 'Distance_ToBiofilmCenterOfMass'
+        case 'Distance_ToBiofilmCenter'
             handles.handles_analysis.uicontrols.checkbox.checkbox_overlayBiofilmRadiusAsLine.Enable = 'on';
             
         otherwise
@@ -1272,7 +1272,7 @@ for i = 1:numel(inputFieldEdits)
             enablePlotButton = false;
         end
         
-        if i == 2
+        if i == 2 || i == 1
             fields = strtrim(strsplit(field, ','));
         else
             fields = {field};

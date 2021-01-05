@@ -173,7 +173,7 @@ for j = 1:numel(range)
             
             ticValue = displayTime;
             
-            img_moving_stack_aligned = performImageAlignment2D(img_moving_stack, metadata, 0);
+            img_moving_stack_aligned = performImageAlignment2D(img_moving_stack, metadata, 'linear', 0);
            
             
             sZ = size(img_moving_stack_aligned,3);

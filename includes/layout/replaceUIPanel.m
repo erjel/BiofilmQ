@@ -798,6 +798,23 @@ switch panelName
         
         uix.Empty('Parent', h);
         
+        h.Heights = [objectHeight, objectHeight, 1.5*objectHeight, objectHeight, 5, objectHeight+2*padding+2*spacing, -1];
+        
+        
+    case 'uipanel_workflow_segmentation_mergeAndTransfer'
+        
+        h = uix.VBox('Parent', handles.layout.uipanels.(panelName).Parent, 'Padding', 4*padding, 'Spacing', spacing);
+
+        uix.Empty('Parent', h);
+        
+        
+        
+        handles.uicontrols.text.text_workflow_segmentation_mergeAndTransfer_description.Parent = h;
+        
+        
+        uix.Empty('Parent', h);
+        
+        
         h4a = uix.HBox('Parent', h, 'Padding', 0, 'Spacing', 0);
         handles.layout.uipanels.panel_workflow_segmentation_postprocessing_mergeChannels = uix.Panel('Parent', h4a, 'Padding', padding, 'Title', handles.layout.uipanels.uipanel_workflow_segmentation_postprocessing_mergeChannels.Title);
         h4 = uix.VBox('Parent', handles.layout.uipanels.panel_workflow_segmentation_postprocessing_mergeChannels, 'Padding', 0, 'Spacing', spacing);
@@ -822,11 +839,38 @@ switch panelName
         uix.Empty('Parent', h4a);
         h4a.Widths = [500, -1];
         h4.Heights = [1.5*objectHeight, 2*objectHeight];
-        
-        
+
         uix.Empty('Parent', h);
         
-        h.Heights = [objectHeight, objectHeight, 1.5*objectHeight, objectHeight, 5, objectHeight+2*padding+2*spacing, 5, 4*objectHeight+2*padding+2*spacing, -1];
+        
+        h5a = uix.HBox('Parent', h, 'Padding', 0, 'Spacing', 0);
+        handles.layout.uipanels.uipanel_workflow_segmentation_postprocessing_tranferSegmentaton = uix.Panel('Parent', h5a, 'Padding', padding, 'Title', handles.layout.uipanels.uipanel_workflow_segmentation_postprocessing_tranferSegmentaton.Title);
+        h5 = uix.VBox('Parent', handles.layout.uipanels.uipanel_workflow_segmentation_postprocessing_tranferSegmentaton, 'Padding', 0, 'Spacing', spacing);
+        h5_1a = uix.HBox('Parent', h5, 'Padding', 0, 'Spacing', spacing);
+        handles.uicontrols.text.text_workflow_segmentation_postprocessing_transferChDescr1.Parent = h5_1a;
+        h5_1b = uix.VBox('Parent', h5_1a, 'Padding', 0, 'Spacing', 0);
+        h5_1 = uix.HBox('Parent', h5_1b, 'Padding', 0, 'Spacing', spacing);
+        handles.uicontrols.edit.transferChannel2.Parent = h5_1;
+        handles.uicontrols.text.text_workflow_segmentation_postprocessing_transferChDescr2.Parent = h5_1;
+        handles.uicontrols.edit.transferChannel1.Parent = h5_1;
+        handles.uicontrols.pushbutton.pushbutton_tools_transferChannels.Parent = h5_1;
+        uix.Empty('Parent', h5_1);
+        h5_1.Widths = [40, 60, 40, 90, -1];
+        uix.Empty('Parent', h5_1b);
+        h5_1b.Heights = [objectHeight, -1];
+        h5_1a.Widths = [200, -1];
+        
+        h5_2 = uix.HBox('Parent', h5, 'Padding', 0, 'Spacing', spacing);
+        uix.Empty('Parent', h5_2);
+        handles.uicontrols.text.text_workflow_segmentation_postprocessing_transferChDescr3.Parent = h5_2;
+        h5_2.Widths = [20, -1];
+        uix.Empty('Parent', h5a);
+        h5a.Widths = [500, -1];
+        h5.Heights = [1.5*objectHeight, 2.5*objectHeight];
+
+        uix.Empty('Parent', h);
+        
+        h.Heights = [5, 1.5*objectHeight, 5,  4*objectHeight+2*padding+2*spacing, 10, 4*objectHeight+3*padding+3*spacing, -1];
         
     case 'uipanel_workflow_parameters'
         ha = uix.ScrollingPanel('Parent', handles.layout.uipanels.(panelName).Parent, 'Padding', 0);
@@ -882,6 +926,54 @@ switch panelName
         h1.Widths = [-1, 70];
         uix.Empty('Parent', h);
         h.Heights = [0.85*objectHeight, objectHeight, -1];
+        
+    case 'uipanel_parameterCombination'
+        h = uix.VBox('Parent', handles.layout.uipanels.(panelName).Parent, 'Padding', 2*padding, 'Spacing', spacing);
+        handles.uicontrols.text.text_parameterCombination_explanation.Parent = h;
+        
+        h1 = uix.HBox('Parent', h, 'Padding', 0, 'Spacing', spacing);
+        uix.Empty('Parent', h1);
+        handles.uicontrols.popupmenu.popupmenu_parameterCombination_ParameterChoice.Parent = h1;
+        handles.uicontrols.pushbutton.pushbutton_parameterCombination_add.Parent = h1;
+        uix.Empty('Parent', h1);
+        uix.Empty('Parent', h1);
+        
+        h2 = uix.HBox('Parent', h, 'Padding', 0, 'Spacing', spacing);
+        
+        h3 = uix.VBox('Parent', h2, 'Padding', 0, 'Spacing', spacing);
+        uix.Empty('Parent', h3);
+        handles.uicontrols.edit.edit_parameterCombination_newParamName.Parent = h3;
+        uix.Empty('Parent', h3);
+        uix.Empty('Parent', h3);
+        h3.Heights = [0.5*objectHeight, objectHeight,objectHeight, -1];
+        
+        h4 = uix.VBox('Parent', h2, 'Padding', 0, 'Spacing', spacing);
+        uix.Empty('Parent', h4);
+        handles.uicontrols.text.text_ParameterCombination_Equals.Parent = h4;
+        uix.Empty('Parent', h4);
+        uix.Empty('Parent', h4);
+        h4.Heights = [0.5*objectHeight, objectHeight,objectHeight, -1];
+        
+        h5 = uix.VBox('Parent', h2, 'Padding', 0, 'Spacing', spacing);
+        handles.uicontrols.edit.edit_parameterCombination_formula.Parent = h5;
+        uix.Empty('Parent', h5);
+        h5.Heights = [3*objectHeight, -1];
+        
+        uix.Empty('Parent', h2);
+        
+        h6 = uix.VBox('Parent', h2, 'Padding', 0, 'Spacing', spacing);
+        uix.Empty('Parent', h6);
+        handles.uicontrols.pushbutton.pushbutton_parameterCombination_testExpression.Parent = h6;
+        uix.Empty('Parent', h6);
+        uix.Empty('Parent', h6);
+        h6.Heights = [0.5*objectHeight, objectHeight,objectHeight, -1];
+
+        uix.Empty('Parent', h2);
+        
+        h1.Widths = [210, 250, 50, 200,-1];
+        h2.Widths = [150, 50, 310, 50, 150,-1];
+        uix.Empty('Parent', h);
+        h.Heights = [3*objectHeight, objectHeight, 4*objectHeight, -1];
         
     case 'uipanel_parameters_inputTemplate'
         h = uix.VBox('Parent', handles.layout.uipanels.(panelName).Parent, 'Padding', 2*padding, 'Spacing', spacing);

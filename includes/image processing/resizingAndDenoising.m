@@ -48,6 +48,10 @@ if params.rotateImage && size(img, 3) > 1
     [img, params] = rotateBiofilmImg(img, params, silent);
 end
 
+if params.topHatFiltering
+    
+    img = topHatFilter(img, params);
+end
 
 
 

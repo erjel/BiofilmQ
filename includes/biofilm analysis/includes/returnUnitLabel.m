@@ -272,7 +272,7 @@ if ~isempty(strfind(fieldName, 'Haralick'))
     unit = '';
     rangeLabel = addRangeLabel(fieldName, 'vox');
 end
-if ~isempty(strfind(fieldName, 'Distance_ToBiofilmCenterOfMass'))
+if ~isempty(strfind(fieldName, 'Distance_ToBiofilmCenter'))
     label = 'd_{CM}';
     unit = '\mum';
     range = [0 40];
@@ -456,7 +456,7 @@ if ~isempty(strfind(fieldName, 'Branches_Number'))
 end
 if ~isempty(strfind(fieldName, 'RelativeAbundance'))
     [rangeLabel, ch] = addRangeLabel(fieldName, '');
-    label = sprintf('Relative biomass abundance (ch %d)', ch);
+    label = sprintf('Relative biovolume abundance (ch %d)', ch);
     unit = '%';
 end
 
@@ -479,26 +479,9 @@ end
 
 if nargin > 1
     if isempty(range)
-        
-        
-        Ncells = zeros(1, numel(biofilmData.data));
-        for i = 1:numel(biofilmData.data)
-            Ncells(i) = numel([biofilmData.data(i).(database)]);
-        end
-        dataValues = zeros(1, sum(Ncells));
-        NcellsCum = cumsum([1 Ncells]);
-        for i = 1:numel(biofilmData.data)
-            try
-                warning('off')
-                dataValues(NcellsCum(i):NcellsCum(i+1)-1) = [biofilmData.data(i).(database).(fieldName_ori)];
-                warning('on')
-            catch
-                
-                
-                
-                
-            end
-        end
+        dataValues = cellfun(@(x) [x.(fieldName_ori)], {biofilmData.data(:).(database)}, 'un', 0);
+        dataValues = [dataValues{:}];
+        dataValues = dataValues(~isinf(dataValues));
         
         switch rangeMethod
             case 1

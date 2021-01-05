@@ -29,26 +29,30 @@ NBinsX = str2num(get(handles.handles_analysis.uicontrols.edit.edit_binsX, 'Strin
 plotType = handles.handles_analysis.uicontrols.popupmenu.popupmenu_plotType.Value;
 plotErrorbars = get(handles.handles_analysis.uicontrols.checkbox.checkbox_errorbars, 'Value');
 
-normalizeByBiomass = false;
-switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_averaging, 'Value')
-    case 1
-        normalizeByBiomass = true;
-        method = 'normalized by biomass';
-    case 2
-        averagingFcn = @nanmean;
-        method = 'mean';
-    case 3
-        averagingFcn = @nanmedian;
-        method = 'median';
-    case 4
-        averagingFcn = @nansum;
-        method = 'sum';
-    case 5
-        averagingFcn = @nanmin;
-        method = 'min';
-    case 6
-        averagingFcn = @nanmax;
-        method = 'max';
+normalizeByBiovolume = false;
+if strcmp(handles.handles_analysis.uicontrols.popupmenu.popupmenu_averaging.Enable, 'on')
+    switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_averaging, 'Value')
+        case 1
+            normalizeByBiovolume = true;
+            method = 'normalized by biovolume';
+        case 2
+            averagingFcn = @nanmean;
+            method = 'mean';
+        case 3
+            averagingFcn = @nanmedian;
+            method = 'median';
+        case 4
+            averagingFcn = @nansum;
+            method = 'sum';
+        case 5
+            averagingFcn = @nanmin;
+            method = 'min';
+        case 6
+            averagingFcn = @nanmax;
+            method = 'max';
+    end
+else
+    method = '';
 end
 
 scaling = biofilmData.params.scaling_dxy/1000;
@@ -63,15 +67,6 @@ database = databaseString{databaseValue};
 
 publication = true;
 
-legendStr = {};
-
-if ~isempty(get(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String'))
-    yLabel = get(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String');
-    yUnit = get(handles.handles_analysis.uicontrols.edit.edit_yLabel_unit, 'String');
-else
-    yLabel = 'Counts';
-    yUnit = '';
-end
 
 if get(handles.handles_analysis.uicontrols.checkbox.checkbox_clusterBiofilm, 'Value') && databaseValue ~= 2
     if ~isfield(biofilmData.data(end).stats, 'IsRelatedToFounderCells')
@@ -83,18 +78,6 @@ else
     clusterBiofilm = 0;
 end
 
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logX, 'Value')
-    scaleX = 'log';
-else
-    scaleX = 'linear';
-end
-
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logY, 'Value')
-    scaleY = 'log';
-else
-    scaleY = 'linear';
-end
-
 field_xaxis = get(handles.handles_analysis.uicontrols.edit.edit_kymograph_xaxis, 'String');
 if plotType == 6
     field_yaxis = get(handles.handles_analysis.uicontrols.edit.edit_kymograph_yaxis, 'String');
@@ -102,48 +85,11 @@ else
     field_yaxis = field_xaxis;
 end
 
-xFields = strtrim(strsplit(field_xaxis, ','));
-nFields = numel(xFields);
-
-if nFields == 1
-    if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoXRange, 'Value')
-        [xLabel, xUnit, xRange, legendStr] = returnUnitLabel(field_xaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodX, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX, 'Value'));
-        set(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String', num2str(xRange, '%.2f %.2f'));
-        set(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String', xLabel);
-        set(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String', xUnit);
-    else
-        xRangeStr = str2num(get(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String'));
-        xRange = [xRangeStr(1) xRangeStr(2)];
-    end
-
-    if ~isempty(get(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String'))
-        xLabel = get(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String');
-        xUnit = get(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String');
-    end
-else
-    xLabel = strrep(field_xaxis, '_', '');
-    xRange = [];
-    xUnit = '';
-end
-
 if plotType == 6
-    filename = [field_xaxis];
-else
     filename = [field_yaxis, ' resolved vs ', field_xaxis, ' ', method];
-end
-
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoXRange, 'Value')
-    [xLabel, xUnit, xRange] = returnUnitLabel(field_xaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodX, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX, 'Value'));
-    set(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String', num2str(xRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String', xLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String', xUnit);
 else
-    xRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String'));
-    xLabel = get(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String');
-    xUnit = get(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String');
+    filename = [field_xaxis];
 end
-
-y_type = field_xaxis;
 
 if exist(fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.fig']), 'file') && (~overwritePlots && savePlots)
     file = dir(fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.fig']));
@@ -161,7 +107,6 @@ if get(handles.handles_analysis.uicontrols.checkbox.useRefTimepoint, 'Value')
 else
     timeShift = 0;
 end
-
 
 figHandles = findobj('Type', 'figure');
 if numel(figHandles) == 1
@@ -181,12 +126,50 @@ end
 set(h_ax, 'NextPlot', 'add');
 
 
+xFields = strtrim(strsplit(field_xaxis, ','));
+yFields = strtrim(strsplit(field_yaxis, ','));
+nFields = numel(xFields);
+
+xRanges = {};
+if ~get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoXRange, 'Value')
+     xRange = get(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String');
+     xRanges = strtrim(strsplit(xRange, ','));
+end
+
+if numel(xRanges) ~= nFields 
+    xRanges = cell(nFields, 1);
+    for i = 1:nFields
+        if ~handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX.Value
+            
+           [~, ~, xRange] = returnUnitLabel(xFields{i});
+        end
+        
+        if handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX.Value || ...
+                (~handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX.Value  && ...
+                isempty(xRange))
+            
+            [~, ~, xRange] = returnUnitLabel(xFields{i}, ...
+                biofilmData, ...
+                database, ...
+                get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodX, 'Value'), ...
+                true);
+        end
+        
+        xRanges{i} = num2str(xRange, '%.2f %.2f');
+    end
+    
+    
+    xRanges_str = join(xRanges, ', ');
+    handles.handles_analysis.uicontrols.edit.edit_xRange.String = xRanges_str{:};
+end
+
+
 for field = 1:nFields  
 
     [X, Y, ~, ~, B] = extractDataBiofilm(biofilmData,...
         'database',     database,...
-        'fieldX',       field_xaxis,...
-        'fieldY',       field_yaxis,...
+        'fieldX',       xFields{field},...
+        'fieldY',       yFields{field},...
         'timeShift',    timeShift,...
         'scaling',      scaling,...
         'removeZOffset',removeZOffset,...
@@ -198,6 +181,8 @@ for field = 1:nFields
     Y = [Y{:}];
     B = [B{:}];
     
+    xRange = str2num(xRanges{field});
+    
     if xRange(1) == xRange(2) && numel(unique(X)) == 1
         Y = sum(X);
         X = X(1);
@@ -207,27 +192,29 @@ for field = 1:nFields
             [~, bins_idx] = histc(X , dX);
             
             bin_array = cell(numel(dX), 1);
-            biomass_array = cell(numel(dX), 1);
+            biovolume_array = cell(numel(dX), 1);
             
             for b = 1:numel(bin_array)
                 bin_idx = find(bins_idx==b);
                 if ~isempty(bin_idx)
                     bin_array{b} = Y(bin_idx);
-                    biomass_array{b} = B(bin_idx);
+                    biovolume_array{b} = B(bin_idx);
                 end
             end
-            biomass_array(cellfun(@isempty, bin_array)) = repmat({0}, sum(cellfun(@isempty, bin_array)), 1);
-            bin_array(cellfun(@isempty, bin_array)) = repmat({0}, sum(cellfun(@isempty, bin_array)), 1);
+            biovolume_array(cellfun(@isempty, biovolume_array)) = {0};
+            bin_array(cellfun(@isempty, bin_array)) = {0};
+            
+            bin_array = cellfun(@(x) x(isfinite(x)), bin_array, 'un', 0);
 
             
             
-            if normalizeByBiomass
-                Y = cellfun(@(x, b) sum(x.*b)/sum(b), bin_array, biomass_array, 'UniformOutput', false);
+            if normalizeByBiovolume
+                Y = cellfun(@(x, b) biovolumeAverage(x,b), bin_array, biovolume_array, 'UniformOutput', false);
                 
                 try
-                    dY = cellfun(@(x, b, m) sqrt(sum((x-m).^2.*(b/sum(b)))), bin_array, biomass_array, Y, 'UniformOutput', true);
+                    dY = cellfun(@(x, b, m) sqrt(sum((x-m).^2.*(b/sum(b)))), bin_array, biovolume_array, Y, 'UniformOutput', true);
                 catch
-                    dY = cellfun(@(x, b, m) sqrt(sum((x-m).^2.*(b/sum(b)))), bin_array, biomass_array, Y, 'UniformOutput', false);
+                    dY = cellfun(@(x, b, m) sqrt(sum((x-m).^2.*(b/sum(b)))), bin_array, biovolume_array, Y, 'UniformOutput', false);
                     dY = generateUniformOutput(dY);
                 end
                 dY = [dY'; dY'];
@@ -237,9 +224,9 @@ for field = 1:nFields
                 
                 if isequal(averagingFcn, @nanmean)
                     try
-                        dY = cellfun(@(x) nanstd(x), bin_array, 'UniformOutput', true);
+                        dY = cellfun(@nanstd, bin_array, 'UniformOutput', true);
                     catch
-                        dY = cellfun(@(x) nanstd(x), bin_array, 'UniformOutput', false);
+                        dY = cellfun(@nanstd, bin_array, 'UniformOutput', false);
                         dY = generateUniformOutput(dY);
                     end
                     dY = [dY'; dY'];
@@ -281,6 +268,15 @@ for field = 1:nFields
     
 end
 
+
+[xLabel, yLabel] = getLabelsFromGUI(handles, {'', '', '', ''});
+[xUnit, yUnit] = getUnitsFromGUI(handles, {'', '', '', ''});
+
+if isempty(yLabel)
+    yLabel = 'Counts';
+end
+
+
 if strcmp(yUnit, '')
     ylabel(h_ax, yLabel)
 else
@@ -293,7 +289,15 @@ else
 end
 
 try
-    xlim(h_ax, [xRange(1)-0.05*diff(xRange) xRange(2)+0.05*diff(xRange)]);
+    if ~all(cellfun(@isempty ,xRanges))
+        overallRange = cellfun(@str2num, xRanges, 'un', 0);
+        overallRange = [min([overallRange{:}]), max([overallRange{:}])];
+        if range(overallRange) ~= 0
+            xlim(h_ax, [overallRange(1)-0.05*diff(overallRange) overallRange(2)+0.05*diff(overallRange)]);
+        end
+    end
+catch err
+    warning(err.message);
 end
 
 if strcmp(xUnit, '')
@@ -302,13 +306,13 @@ else
     xlabel(h_ax, [xLabel, ' ', xUnit])
 end
 
-if strcmp(scaleX, 'log')
+if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logX, 'Value')
     set(h_ax, 'XScale', 'log', 'Xtick', [1 10 10^2 10^3 10^4], 'XTickLabel', {'1', '10', '10^2', '10^3', '10^4'});
 else
     set(h_ax, 'XScale', 'linear');
 end
 
-if strcmp(scaleY, 'log')
+if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logY, 'Value')
     set(h_ax, 'YScale', 'log');
 else
     set(h_ax, 'YScale', 'linear');
@@ -316,7 +320,11 @@ end
 
 box(h_ax, 'on');
 if nFields > 1
-    legend(yFields);
+    legend(yFields, 'interpreter', 'None');
+    for i = 1:numel(h_ax.Children)
+        h_ax.Children(i).EdgeAlpha = 0.5;
+        h_ax.Children(i).FaceAlpha = 0.5;
+    end
 end
 
 if handles.handles_analysis.uicontrols.checkbox.checkbox_applyCustom2.Value
@@ -357,17 +365,18 @@ end
 
 
 print(h, '-dpng','-r300',fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.png']));
-if isunix
-    print(h, '-depsc','-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.eps']));
-else
-    print(h, '-depsc ','-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.eps']));
-end
+print(h, '-depsc','-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.eps']));
+
 
 
 function map = generateUniformOutput(map)
 noEntry = cellfun(@(x) isempty(x), map, 'UniformOutput', true);
-map(noEntry) = num2cell(repmat(NaN, sum(noEntry(:)),1));
+map(noEntry) = num2cell(NaN(sum(noEntry(:)),1));
 map = cell2mat(map);
+
+function result = biovolumeAverage(x,b)
+isValid = isfinite(x);
+result = sum(x(isValid).*b(isValid))/sum(b(isValid));
 
 
 

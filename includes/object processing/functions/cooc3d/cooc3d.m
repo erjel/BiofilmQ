@@ -56,7 +56,7 @@
 %   direction 1;
 %The haralick features used (in order) are:
 %Energy, Entropy, Correlation, Contrast,  Homogeneity, Variance, SumMean,
-%Inertia, Cluster Shade, Cluster tendendy, MaxProbability, 
+%Inertia, Cluster Shade, Cluster tendency, MaxProbability, 
 %Inverse Variance.
 
 
@@ -271,7 +271,7 @@ return
 %numHarFeature is the number of variables you will be extracting.
 %Haralick order
 %Energy, Entropy, Correlation, Contrast, Variance, SumMean, Inertia, 
-%Cluster Shade, Cluster tendendy, Homogeneity,MaxProbability, 
+%Cluster Shade, Cluster tendency, Homogeneity,MaxProbability, 
 %Inverse Variance.
 %harMat = matrix of the haralick features in the format harMat(direction,
 %feature)

@@ -42,7 +42,7 @@ end
 interpolate = checkInput(varargin, 'interpolate', false);
 filterExpr = checkInput(varargin, 'filterExpr', '');
 clusterBiofilm = checkInput(varargin, 'clusterBiofilm', false);
-normalizeByBiomass = checkInput(varargin, 'normalizeByBiomass', false);
+normalizeByBiovolume = checkInput(varargin, 'normalizeByBiovolume', false);
 
 clear varargin;
 
@@ -139,7 +139,7 @@ end
 
 [X, Y] = meshgrid(binsX, binsY);
 Z = cell(size(X));
-if normalizeByBiomass
+if normalizeByBiovolume
    B = cell(size(X));
 end
 ignoringData = false;
@@ -227,13 +227,13 @@ for i = 1:numel(biofilmData.data)
                 z = getData(biofilmData.data(i), database, fieldZ, scaling, zOffset, filterExpr, clusterBiofilm);
         end
         
-        if normalizeByBiomass
+        if normalizeByBiovolume
             if ~any(contains(biofilmData.data(i).measurementFields, 'Shape_Volume'))
                 
                 
-                biomass = getData(biofilmData.data(i), database, 'Volume', scaling, zOffset, filterExpr, clusterBiofilm);
+                biovolume = getData(biofilmData.data(i), database, 'Volume', scaling, zOffset, filterExpr, clusterBiofilm);
             else
-                biomass = getData(biofilmData.data(i), database, 'Shape_Volume', scaling, zOffset, filterExpr, clusterBiofilm);
+                biovolume = getData(biofilmData.data(i), database, 'Shape_Volume', scaling, zOffset, filterExpr, clusterBiofilm);
             end
         end
         
@@ -254,8 +254,8 @@ for i = 1:numel(biofilmData.data)
             
             if ~isempty(idxX) && ~isempty(idxY)
                 Z{idxY, idxX} = [Z{idxY, idxX} z(n)];
-                if normalizeByBiomass
-                    B{idxY, idxX} = [B{idxY, idxX} biomass(n)];
+                if normalizeByBiovolume
+                    B{idxY, idxX} = [B{idxY, idxX} biovolume(n)];
                 end
             else
                 ignoringData = true;
@@ -272,10 +272,10 @@ if ignoringData
 end
 warning('backtrace', 'on')
 
-if normalizeByBiomass
+if normalizeByBiovolume
     try
         
-        map = cellfun(@mapNormalizedByBiomass, Z, B, 'UniformOutput', true);
+        map = cellfun(@mapNormalizedByBiovolume, Z, B, 'UniformOutput', true);
         
     catch
         map = cellfun(@(x, b) nansum(x.*b)/nansum(b), Z, B, 'UniformOutput', false);
@@ -366,7 +366,7 @@ noEntry = cellfun(@(x) isempty(x), map, 'UniformOutput', true);
 map(noEntry) = num2cell(repmat(NaN, sum(noEntry(:)),1));
 map = cell2mat(map);
 
-function mapEntry = mapNormalizedByBiomass(x, b)
+function mapEntry = mapNormalizedByBiovolume(x, b)
 nans = isnan(x) | isnan(b);
 b(nans) = [];
 x(nans) = [];

@@ -18,6 +18,8 @@
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
 %%
+
+
 function objects_merged = mergeChannelsCube(objects, channelArray, res)
 fprintf(' - merging gridded data...\n');
 
@@ -39,6 +41,12 @@ w(all_, :, :, :) = any(w(1:N, :, :, :), 1);
         
 objects_merged = cubeSegmentation(squeeze(w(all_, :, :, :)), res);
 
+if numel(objects_merged.ImageSize)==2
+    centroids = cellfun(@(x) [x 1], {objects_merged.stats.Centroid}, 'UniformOutput', false);
+    [objects_merged.stats.Centroid] = centroids{:};
+    boundingBoxes = cellfun(@(x) [x(1:2) 0.5 x(3:4) 1], {objects_merged.stats.BoundingBox}, 'UniformOutput', false);
+    [objects_merged.stats.BoundingBox] = boundingBoxes{:};
+end
     
 numObjects = objects_merged.NumObjects;
 

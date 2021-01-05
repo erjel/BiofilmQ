@@ -20,24 +20,15 @@
 %%
 function moveImageToChannel(path, name, originalChannel, newChannel)
 
+    assert(~isnan(originalChannel))
 
     pathToDeconvolution = fullfile(path, 'deconvolved images');
     originalName = strrep(name, '_cmle', '');
+    new_Channel_str = sprintf('_ch%d_', newChannel);
+    
+    newName = regexprep(originalName, '_ch\d+_', new_Channel_str);
+    assert(~strcmp(newName,originalName));
 
-    
-    new = num2str(newChannel);
-    if isnan(originalChannel)
-        chStart = strfind(originalName, '_frame');
-        newName = [originalName(1:chStart-1), '_ch', new, originalName(chStart:end)];
-        originalName = lower([originalName(1:chStart-1), '_ch1', originalName(chStart:end)]);
-        originalChannel = 1;
-    else
-        chStart = strfind(originalName, 'ch');
-        underScores = strfind(originalName, '_');
-        chEnd = underScores(find((underScores - chStart)>0, 1))-1;
-        newName = [originalName(1:chStart+1), new, originalName(chEnd+1:end)];
-    end
-    
     
     
     

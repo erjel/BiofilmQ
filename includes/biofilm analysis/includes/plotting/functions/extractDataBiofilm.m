@@ -39,7 +39,7 @@ if isempty(averagingFcn)
 end
 filterExpr = checkInput(varargin, 'filterExpr', '');
 clusterBiofilm = checkInput(varargin, 'clusterBiofilm', false);
-normalizeByBiomass = checkInput(varargin, 'normalizeByBiomass', false);
+normalizeByBiovolume = checkInput(varargin, 'normalizeByBiovolume', false);
 
 clear p;
 
@@ -124,7 +124,7 @@ Y = cell(1, numel(biofilmData.data));
 Z = cell(1, numel(biofilmData.data));
 C = cell(1, numel(biofilmData.data));
 
-if normalizeByBiomass
+if normalizeByBiovolume
     B = cell(1, numel(biofilmData.data));
 end
 
@@ -272,13 +272,13 @@ for i = 1:numel(biofilmData.data)
             c = NaN;
         end
         
-        if normalizeByBiomass
+        if normalizeByBiovolume
             if ~any(contains(biofilmData.data(i).measurementFields, 'Shape_Volume'))
                 
                 
-                [biomass, status] = getData(biofilmData.data(i), database, 'Volume', scaling, zOffset, filterExpr, clusterBiofilm);
+                [biovolume, status] = getData(biofilmData.data(i), database, 'Volume', scaling, zOffset, filterExpr, clusterBiofilm);
             else
-                [biomass, status] = getData(biofilmData.data(i), database, 'Shape_Volume', scaling, zOffset, filterExpr, clusterBiofilm);
+                [biovolume, status] = getData(biofilmData.data(i), database, 'Shape_Volume', scaling, zOffset, filterExpr, clusterBiofilm);
             end
         end
         
@@ -295,8 +295,8 @@ for i = 1:numel(biofilmData.data)
         Z{i} = z;
         C{i} = c;
         
-        if normalizeByBiomass
-           B{i} = biomass; 
+        if normalizeByBiovolume
+           B{i} = biovolume; 
         end
 
     catch error
@@ -306,7 +306,7 @@ for i = 1:numel(biofilmData.data)
     end
 end
 
-if normalizeByBiomass
+if normalizeByBiovolume
 
     mX = cellfun(@(x, b) sum(x.*b)/sum(b), X, B, 'UniformOutput', false);
     mY = cellfun(@(x, b) sum(x.*b)/sum(b), Y, B, 'UniformOutput', false);
@@ -361,7 +361,7 @@ if size(dX, 1) == 1
 end
 
 
-if normalizeByBiomass
+if normalizeByBiovolume
     X = generateUniformOutput(mX);
     Y = generateUniformOutput(mY);
 else

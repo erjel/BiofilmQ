@@ -31,6 +31,8 @@ databaseValue = get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_data
 databaseString = handles.settings.databases;
 database = databaseString{databaseValue};
 
+publication = true;
+
 addPlot = get(handles.handles_analysis.uicontrols.checkbox.checkbox_addPlotToCurrentFigure, 'Value');
 
 switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_plotType, 'Value')
@@ -83,78 +85,6 @@ if exist(fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' '
     end
 end
 
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoColorRange, 'Value')
-    [cLabel, cUnit, cRange] = returnUnitLabel(field_caxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodColor, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeColor, 'Value'));
-    set(handles.handles_analysis.uicontrols.edit.edit_colorRange, 'String', num2str(cRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_colorLabel, 'String', cLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_colorLabel_unit, 'String', cUnit);
-else
-    cRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_colorRange, 'String'));
-end
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoYRange, 'Value')
-    [yLabel, yUnit, yRange] = returnUnitLabel(field_yaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodY, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY, 'Value'));
-    set(handles.handles_analysis.uicontrols.edit.edit_yRange, 'String', num2str(yRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String', yLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_yLabel_unit, 'String', yUnit);
-else
-    yRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_yRange, 'String'));
-end
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoXRange, 'Value')
-    [xLabel, xUnit, xRange] = returnUnitLabel(field_xaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodX, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX, 'Value'));
-    set(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String', num2str(xRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String', xLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String', xUnit);
-else
-    xRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String'));
-end
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoZRange, 'Value')
-    [zLabel, zUnit, zRange] = returnUnitLabel(field_zaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodZ, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeZ, 'Value'));
-    set(handles.handles_analysis.uicontrols.edit.edit_zRange, 'String', num2str(zRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_zLabel, 'String', zLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_zLabel_unit, 'String', zUnit);
-else
-    zRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_zRange, 'String'));
-end
-
-if ~isempty(get(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String'))
-    xLabel = get(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String');
-    xUnit = get(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String');
-end
-
-if ~isempty(get(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String'))
-    yLabel = get(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String');
-    yUnit = get(handles.handles_analysis.uicontrols.edit.edit_yLabel_unit, 'String');
-end
-
-if ~isempty(get(handles.handles_analysis.uicontrols.edit.edit_zLabel, 'String'))
-    zLabel = get(handles.handles_analysis.uicontrols.edit.edit_zLabel, 'String');
-    zUnit = get(handles.handles_analysis.uicontrols.edit.edit_zLabel_unit, 'String');
-end
-
-if ~isempty(get(handles.handles_analysis.uicontrols.edit.edit_colorLabel, 'String'))
-    cLabel = get(handles.handles_analysis.uicontrols.edit.edit_colorLabel, 'String');
-    cUnit = get(handles.handles_analysis.uicontrols.edit.edit_colorLabel_unit, 'String');
-end
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logX, 'Value')
-    scaleX = 'log';
-else
-    scaleX = 'linear';
-end
-
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logY, 'Value')
-    scaleY = 'log';
-else
-    scaleY = 'linear';
-end
-
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logZ, 'Value')
-    scaleZ = 'log';
-else
-    scaleZ = 'linear';
-end
-
-publication = true;
-
 figHandles = findobj('Type', 'figure');
 if numel(figHandles) == 1
     addPlot = 0;
@@ -175,6 +105,7 @@ else
     timeShift = 0;
 end
 colorPlot = 0;
+Z = {};
 switch scatterType
     case '2D'
         [X, Y, ~, ~, ~, C] = extractDataBiofilm(biofilmData,...
@@ -251,22 +182,54 @@ end
 
 
 
-if strcmp(scaleX, 'log')
+[xLabel, yLabel, zLabel, cLabel] = getLabelsFromGUI(handles, ...
+    {field_xaxis, field_yaxis, field_zaxis, field_caxis});
+[xUnit, yUnit, zUnit, cUnit] = getUnitsFromGUI(handles, ...
+    {field_xaxis, field_yaxis, field_zaxis, field_caxis});
+
+
+[xRange, yRange, zRange, cRange] = getRangeFromGUI(handles, ...
+    {field_xaxis, field_yaxis, field_zaxis, field_caxis}, {{X}, {Y}, {Z}, {C}});
+
+ranges = cellfun(@str2num, {xRange, yRange, zRange, cRange}, 'un', 0);
+[xRange, yRange, zRange, cRange] = ranges{:};
+
+if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logX, 'Value')
     set(h_ax, 'XScale', 'log', 'Xtick', [1 10 10^2 10^3 10^4], 'XTickLabel', {'1', '10', '10^2', '10^3', '10^4'});
 else
     set(h_ax, 'XScale', 'linear');
 end
-    
-if strcmp(scaleY, 'log')
+
+if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logY, 'Value')
     set(h_ax, 'YScale', 'log');
 else
     set(h_ax, 'YScale', 'linear');
 end
 
-set(h_ax, 'ylim', yRange, 'xlim', xRange)
+if get(handles.handles_analysis.uicontrols.checkbox.checkbox_logZ, 'Value')
+    scaleZ = 'log';
+else
+    scaleZ = 'linear';
+end
+
+if ~isempty(yRange)
+    set(h_ax, 'ylim', yRange);
+end
+
+if ~isempty(xRange)
+    set(h_ax,'xlim', xRange)
+end
+
 
 if strcmp(scatterType, '4D')
-    set(h_ax, 'zlim', zRange, 'clim', cRange);
+    
+    if ~isempty(zRange)
+        set(h_ax, 'zlim', zRange)
+    end
+    
+    if ~isempty(cRange)
+        set(h_ax, 'clim', cRange);
+    end
     
     if strcmp(scaleZ, 'log')
         set(h_ax, 'ZScale', 'log');
@@ -282,7 +245,11 @@ if strcmp(scatterType, '4D')
 end
 
 if colorPlot 
-    set(h_ax, 'clim', cRange);
+    
+    if ~isempty(cRange)
+        set(h_ax, 'clim', cRange);
+    end
+    
     warning off;
     c = colorbar;
     if strcmp(cUnit, '')
@@ -308,8 +275,7 @@ end
 
 
 
-if publication
-else
+if ~publication
     title(h_ax, [xLabel, ' vs. ', yLabel]);
 end
 
@@ -348,11 +314,8 @@ end
 savefig(h, fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.fig']));
 
 print(h, '-dpng','-r300',fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, '.png']));
-if isunix
-    print(h, '-depsc','-r300', '-painters' ,fullfile(directory, [database, ' ', filename, '.eps']));
-else
-    print(h, '-depsc ','-r300', '-painters' ,fullfile(directory, [database, ' ', filename, '.eps']));
-end
+print(h, '-depsc','-r300', '-painters' ,fullfile(directory, [database, ' ', filename, '.eps']));
+
 
 
 

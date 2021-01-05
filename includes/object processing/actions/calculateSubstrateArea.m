@@ -55,6 +55,7 @@ end
 
 [objects.stats.Architecture_LocalSubstrateArea] = coverage{:};
 objects.globalMeasurements.Biofilm_SubstrateArea = toUm2(sum([coverage{:}]), objects.params.scaling_dxy);
+objects.globalMeasurements.Biofilm_SubstratumCoverage = sum([coverage{:}])/(objects.ImageSize(1)*objects.ImageSize(2));
 
 end
 

@@ -79,8 +79,11 @@ for i = 1:size(parameters, 1)
                 case 'tag cells'
                     objects = tagCells(objects, params);    
 
-                case 'user-defined parameter'
-                    objects = calculateUserDefinedParameter(handles, objects, params, parameters{i,3}, index, filename);     
+                case 'parameter based on user-defined matlab script'
+                    objects = calculateUserDefinedParameter(handles, objects, params, parameters{i,3}, index, filename); 
+                    
+                case 'custom parameter'
+                    objects = calculateParameterCombination(handles, objects, params); 
                     
                 
                     

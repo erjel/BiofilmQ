@@ -128,7 +128,9 @@ for k = 1:t_max
     if isfield(data, 'metadata')
         metadata = data.metadata;
     else
+        try
         metadata = load(fullfile(input_folder, strrep(cells(k).name, '_data.mat', '_metadata.mat')));
+        end
     end
     
     

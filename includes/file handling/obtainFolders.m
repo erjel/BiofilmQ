@@ -60,15 +60,6 @@ if strcmpi(state, 'processed')
     folders = cellfun(@fileparts, folders, 'UniformOutput', false);
 end
  
-continueWithFolders = false(1, numel(folders));
-for i = 1:numel(folders)
-    [~, lastFolder] = fileparts(strrep(folders{i}, '.', '_'));
-    if ~isempty(strfind(lower(lastFolder), 'pos'))
-        continueWithFolders(i) = true;
-    end
-end
-folders = folders(continueWithFolders);
-
 if strcmpi(state, 'unprocessed')
     
     continueWithFolders = false(1, numel(folders));

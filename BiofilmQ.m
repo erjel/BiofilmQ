@@ -75,18 +75,25 @@ end
 
 function BiofilmQ_OpeningFcn(hObject, eventdata, handles, varargin)
 
-fprintf('=== BiofilmQ - The Biofilm Segmentation Toolbox ===\n')
+currentDir = fileparts(mfilename('fullpath'));
+chdir(currentDir);
+
+if isdeployed
+    versions = textscan(fopen('biofilmQ_version.txt'), '%s');
+else
+    versions = textscan(fopen(fullfile('includes', 'biofilmQ_version.txt')), '%s');
+end
+version = versions{1}{1};
+
+fprintf('=== BiofilmQ - The Biofilm Segmentation Toolbox (%s) ===\n', version)
 fprintf('Copyright (c) 2016-2019 by Raimo Hartmann\n');
-fprintf('Copyright (c) 2018-2019 by Hannah Jeckel\n');
-fprintf('Copyright (c) 2018-2019 by Eric Jelli\n');
-fprintf('  Max Planck Institute for Terrestrial Microbiology, Marburg\n');
-fprintf('  Philipps Universitaet, Marburg\n');
+fprintf('Copyright (c) 2018-2020 by Hannah Jeckel\n');
+fprintf('Copyright (c) 2018-2020 by Eric Jelli\n');
 fprintf('Loading... ');
 
 handles.output = hObject;
 
-currentDir = fileparts(mfilename('fullpath'));
-chdir(currentDir);
+
 
 if ~isdeployed
     addpath(genpath(fullfile(currentDir, 'includes')));
@@ -154,11 +161,13 @@ handles = tidyGUIHandles(handles);
 if isdeployed
     handles.settings.declumpingMethodImages = { ...
         imread('gridding.png'), ...
-        imread('none.png')};
+        imread('none.png'),...
+        imread('labels.png')};
 else
     handles.settings.declumpingMethodImages = { ...
         imread(fullfile(currentDir, 'includes', 'help', 'gridding.png')), ...
-        imread(fullfile(currentDir, 'includes', 'help', 'none.png'))};
+        imread(fullfile(currentDir, 'includes', 'help', 'none.png')),...
+        imread(fullfile(currentDir, 'includes', 'help', 'labels.png'))};
 end
 
 
@@ -200,6 +209,9 @@ cellParametersCalculate =...
     'Distance to surface, option: resolution [vox]', false, 2, 'numeric', 'Enter the smoothing range [in vox] to estimate the global biofilm shape.', 'distanceToSurface [in um]', [],...
     'Estimate the distance to the <i>upper</i> biofilm outer surface for each object.', ...
     'usage/parameter_calculation.html#distance-to-surface';...
+    'Distance to nearest neighbor, option: channel', false, 1, 'numeric', 'Please enter the channel number containing the objects you want to measure the closest distance to. Note the the image has to be segmented.', 'Distance_ToNearestNeighbor [in um]', [],...
+    'Calculate the centroid-to-centroid distance to the nearest neighbor in a specific channel.', ...
+    'usage/parameter_calculation.html#distance-to-nearest-neighbor';...
     'Distance to specific object, option: object ID', false, '', 'numeric', 'Enter the ID of the specific object the centroid-to-centroid distance shall be measured to.', 'distanceToCell_(ID) [in um]', [],...
     'Calculate the distance to a specific object.', ...
     'usage/parameter_calculation.html#distance-to-specific-object';...
@@ -212,7 +224,10 @@ cellParametersCalculate =...
     'Tag cells', false, 'Click to see options', [], [], 'Name of tagged cells can be freely choosen', [],...
     'Tag cells following certain criteria with user-defined tag names.', ...
     'usage/parameter_calculation.html#id7';...
-    'User-defined parameter', false, '', 'file', 'Please choose a Matlab script.', 'User_defined', [],...
+    'Custom parameter', false, 'Click to see options', [], [], 'Name of new Parameter can be freely choosen', [],...
+    'Calculate custom parameter from a combination of already calculated parameters.', ...
+    'usage/parameter_calculation.html#id7';...
+    'Parameter based on user-defined Matlab script', false, '', 'file', 'Please choose a Matlab script.', 'User_defined', [],...
     'Use the script "includes/cell processing/actions/user-defined parameters/template.m" as template for creating further models', ...
     'usage/parameter_calculation.html#custom-parameters'};
 
@@ -238,6 +253,7 @@ end
 logoPath = ['file:///', strrep(logoPath, filesep, '/')];
 welcomeMsg = strrep(welcomeMsg, '{{logo}}', logoPath);
 welcomeMsg = strrep(welcomeMsg, '{{background_color}}', rgb2hex(get(0,'defaultUicontrolBackgroundColor')));
+
 browserJ = com.mathworks.mlwidgets.html.HTMLBrowserPanel;
 handles.uicontrols.text.htmlBrowser = javacomponent(browserJ, [], handles.layout.mainLayout);
 handles.uicontrols.text.htmlBrowser.setHtmlText(welcomeMsg);
@@ -352,6 +368,7 @@ handles = populateTabs(handles, 'uipanel_workflow_segmentation_edgeDetection','w
 handles = populateTabs(handles, 'uipanel_workflow_segmentation_thresholding','workflow_segmentationTabs');
 handles = populateTabs(handles, 'uipanel_workflow_segmentation_objectDeclumping','workflow_segmentationTabs');
 handles = populateTabs(handles, 'uipanel_workflow_segmentation_postprocessing','workflow_segmentationTabs');
+handles = populateTabs(handles, 'uipanel_workflow_segmentation_mergeAndTransfer','workflow_segmentationTabs');
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.25)
 
@@ -378,6 +395,7 @@ handles = addPanelToBoxPanel(handles, 'uipanel_parameters_tagCells', 'boxpanel_c
 handles = addPanelToBoxPanel(handles, 'uipanel_parameters_inputTemplate', 'boxpanel_cellParameters_parameterTabs');
 handles = addPanelToBoxPanel(handles, 'uipanel_parameters_inputTemplate_file', 'boxpanel_cellParameters_parameterTabs');
 handles = addPanelToBoxPanel(handles, 'uipanel_parameters_mergingSplitting', 'boxpanel_cellParameters_parameterTabs');
+handles = addPanelToBoxPanel(handles, 'uipanel_parameterCombination', 'boxpanel_cellParameters_parameterTabs');
 
 handles = restylePanel(handles, handles.layout.uipanels.uipanel_experimentFolder);
 handles = restylePanel(handles, handles.layout.uipanels.uipanel_imageRange_visualization);
@@ -434,6 +452,7 @@ handles = replaceUIPanel(handles, 'uipanel_workflow_segmentation_edgeDetection')
 handles = replaceUIPanel(handles, 'uipanel_workflow_segmentation_thresholding');
 handles = replaceUIPanel(handles, 'uipanel_workflow_segmentation_objectDeclumping');
 handles = replaceUIPanel(handles, 'uipanel_workflow_segmentation_postprocessing');
+handles = replaceUIPanel(handles, 'uipanel_workflow_segmentation_mergeAndTransfer');
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.53)
 
@@ -441,6 +460,7 @@ handles = replaceUIPanel(handles, 'uipanel_workflow_parameters');
 handles = replaceUIPanel(handles, 'uipanel_parameterDescription');
 handles = replaceUIPanel(handles, 'uipanel_parameters_filtering');
 handles = replaceUIPanel(handles, 'uipanel_parameters_mergingSplitting');
+handles = replaceUIPanel(handles, 'uipanel_parameterCombination');
 handles = replaceUIPanel(handles, 'uipanel_parameters_inputTemplate_file');
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.58)
@@ -2574,8 +2594,11 @@ params.svd = 0;
 displayStatus(handles, 'Processing image', 'black');
 
 
-
-imgfilter = resizingAndDenoising(double(img1raw), metadata_raw, params);
+if params.declumpingMethod~=3
+    [imgfilter, params] = resizingAndDenoising(double(img1raw), metadata_raw, params);
+else
+    imgfilter = zInterpolation_nearest(double(img1raw), metadata_raw.data.scaling.dxy, metadata_raw.data.scaling.dz, params);
+end
 
 updateWaitbar(handles, 0.8)
 if params.removeBottomSlices
@@ -2732,26 +2755,8 @@ storeValues(hObject, eventdata, handles);
 
 function removeVoxelsOfSize_Callback(hObject, eventdata, handles)
 handles = checkAndStoreInput(handles, hObject, 'inputType', 'numeric', 'range', [0 1e99]);
-checkMinVolumeSize(handles);
 pxSize = convertToUm(handles, str2double(handles.uicontrols.edit.removeVoxelsOfSize.String),3);
 handles.uicontrols.text.text_removeVoxelsOfSize.String = sprintf('vox (%.2f \x03BCm\x00B3)', pxSize);
-
-
-function checkMinVolumeSize(handles)
-if ~isempty(strfind(handles.uicontrols.popupmenu.declumpingMethod.String{handles.uicontrols.popupmenu.declumpingMethod.Value}, 'Cubes')) && get(handles.uicontrols.checkbox.removeVoxels, 'Value')
-    cubeVolume = str2num(handles.uicontrols.edit.gridSpacing.String)^3;
-    removeVolume = str2num(handles.uicontrols.edit.removeVoxelsOfSize.String);
-    
-    if removeVolume > cubeVolume
-        uiwait(msgbox(sprintf('Currently connected volumes with less than %d voxels will be removed.\n\nPlease note that this will remove all cubes, as the cube volume is only %d voxels (at a side length of %s pixels)!\n\nThus, it is strongly recommended to choose another value in the post-processing tab.', removeVolume, cubeVolume, handles.uicontrols.edit.gridSpacing.String), 'Warning', 'warn', 'modal'));
-        return;
-    end
-    
-    if 2*removeVolume > cubeVolume
-        uiwait(msgbox(sprintf('Currently connected volumes with less than %d voxels will be removed.\n\nPlease note that this will remove already cubes which are less than half filled, as the cube volume is only %d voxels (at a side length of %s pixels).', removeVolume, cubeVolume, handles.uicontrols.edit.gridSpacing.String), 'Warning', 'warn', 'modal'));
-    end
-end
-
 
 function removeVoxelsOfSize_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -2989,9 +2994,12 @@ switch handles.uicontrols.popupmenu.declumpingMethod.String{handles.uicontrols.p
             enableDisableChildren(handles.layout.uipanels.panel_declumping_gridOptions, 'off')
             handles.uicontrols.checkbox.considerSiblings.Enable = 'off';
             handles.uicontrols.text.considerSiblings_text.Enable = 'off';
+        case 'Label image'
+            enableDisableChildren(handles.layout.uipanels.panel_declumping_gridOptions, 'off')
+            handles.uicontrols.checkbox.considerSiblings.Enable = 'off';
+            handles.uicontrols.text.considerSiblings_text.Enable = 'off';
     otherwise
             enableDisableChildren(handles.layout.uipanels.panel_declumping_gridOptions, 'off')
-            enableDisableChildren(handles.layout.uipanels.panel_declumpingOptions, 'off')
             handles.uicontrols.edit.searchRadius.String = '3';
             handles.uicontrols.checkbox.considerSiblings.Enable = 'off';
             handles.uicontrols.text.considerSiblings_text.Enable = 'off';
@@ -3021,7 +3029,6 @@ data = load(fullfile(handles.settings.directory, 'parameters.mat'));
 params = data.params;
 handles.uicontrols.edit.searchRadius.String = sprintf('%.1f', str2double(handles.uicontrols.edit.gridSpacing.String)*params.scaling_dxy/1000+0.1);;
 handles = checkAndStoreInput(handles, hObject, 'inputType', 'numeric', 'range', [1 100]);
-checkMinVolumeSize(handles);
 pxSize = convertToUm(handles, str2double(handles.uicontrols.edit.gridSpacing.String),1);
 handles.uicontrols.text.text_workflow_segmentation_objectDeclumping_cubeSideLengthUnit.String = sprintf('vox (%.2f \x03BCm)', pxSize);
 
@@ -3738,7 +3745,7 @@ if ~params.manualThreshold && ~(handles.uicontrols.popupmenu.thresholdingMethod.
         handles.uicontrols.popupmenu.thresholdingMethod.String{handles.uicontrols.popupmenu.thresholdingMethod.Value}, handles.uicontrols.popupmenu.thresholdClasses.String{handles.uicontrols.popupmenu.thresholdClasses.Value}), 'Warning', 'warn', 'modal'));
 end
 
-if get(handles.uicontrols.popupmenu.manualThresholdMethod, 'Value') == 2
+if get(handles.uicontrols.popupmenu.manualThresholdMethod, 'Value') == 2 && params.declumpingMethod~=3
     if params.scaleUp && params.scaleFactor<1
         imgfilter = zInterpolation(imgfilter, params.scaling_dxy, params.scaling_dz, params, 1);
     end
@@ -4646,14 +4653,14 @@ try
         end
         
         if strcmp(type, 'file')
-            handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 4;
+            handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 5;
             handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Visible = 'on';
             handles.uicontrols.text.parameterInputDescription_file.String = question;
             handles.uicontrols.edit.parameters_filePath.UserData = {selectedRow, type};
             handles.uicontrols.pushbutton.pushbutton_parameters_selectFile.UserData = {selectedRow, type};
             
         else
-            handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 5;
+            handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 6;
             handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Visible = 'on';
             
             handles.uicontrols.text.parameterInputDescription.String = question;
@@ -4680,10 +4687,13 @@ try
                 handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 2;
                 handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Visible = 'on';
             case 'fluorescence properties'
-                handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 6;
+                handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 7;
                 handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Visible = 'on';
             case 'tag cells'
-                handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 7;
+                handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 8;
+                handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Visible = 'on';
+            case 'custom parameter'
+                handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Selection = 4;
                 handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Visible = 'on';
             otherwise
                 handles.layout.boxPanels.boxpanel_cellParameters_parameterTabs.Visible = 'off';
@@ -5171,13 +5181,37 @@ function importValidationPushbuttonAll_Callback(hObject, eventdata, handles)
             [handles.uitables.importResults.Data; [{filename, label}, match]];
     end
 
+    
     missing_data = cellfun(@isempty, handles.uitables.importResults.Data);
 
+    missing_cols = sum(missing_data,1);
+    
+    if ~missing_cols(4) 
+            
+        channels = unique(cellfun(@str2num, handles.uitables.importResults.Data(:,4)));
+        channels = sort(channels(:));
+        if any(channels~=(1:numel(channels))')
+            answer = questdlg('Channel numbers need to be increasing integer values, starting at 1. Would you like to automatically correct your channel numbering?', ...
+                    'Invalid channel numbering detected', ...
+                    'Yes','No, keep original channel numbers','Yes');
+
+            switch answer
+                case 'Yes'
+                    for i = 1:size(handles.uitables.importResults.Data, 1)
+                        oldIndex = str2num(handles.uitables.importResults.Data{i, 4});
+                        newIndex = find(channels==oldIndex);
+                        handles.uitables.importResults.Data{i, 4} = ...
+                            sprintf('<html><font color="red">%d</font></html>', newIndex);
+                    end
+                case 'No, keep original channel numbers.'
+                    
+            end
+        end
+    end
 
     if any(missing_data(:))
         if handles.settings.showMsgs
             
-            missing_cols = sum(missing_data, 1);
             missing_metadata = handles.uitables.importResults.ColumnName(find(missing_cols));
             missing_metadata{1} = sprintf('Missing metadata detected! Fill in automatic values for:\n%s', missing_metadata{1});
             default_answer = arrayfun(@num2str, nan(1, sum(missing_cols ~= 0)), 'UniformOutput', false);
@@ -5188,14 +5222,25 @@ function importValidationPushbuttonAll_Callback(hObject, eventdata, handles)
             end
 
             fill_indices = find(missing_cols);
-            fill_values = cellfun(@str2double, answer);
+            
+            fill_converter = { ...
+                @(x) x; @(x) x; @str2double; @str2double; @str2double; @str2double};
+            fill_converter = fill_converter(fill_indices);
+            
+            fill_values = cellfun(@(fun, val) fun(val), fill_converter, answer, 'un', 0);
 
 
             for i = 1:size(handles.uitables.importResults.Data, 1)
                 for j = 1:size(fill_indices, 2)
                     if missing_data(i,fill_indices(j))
+                        switch class(fill_values{j})
+                            case 'double'
+                                format_string = '<html><font color="red">%.0f</font></html>';
+                            case 'char'
+                                format_string = '<html><font color="red">%s</font></html>';
+                        end
                         handles.uitables.importResults.Data{i, fill_indices(j)} = ...
-                            sprintf('<html><font color="red">%.0f</font></html>', fill_values(j));
+                            sprintf(format_string, fill_values{j});
                     end
                 end
             end
@@ -5361,13 +5406,14 @@ function importCustomTiffPushbutton_Callback(hObject, eventdata, handles)
                     end
                 end
 
-                meanProj = mean(stack(:, :, 2:end), 3);
-                meanProj = meanProj - min(meanProj(:));
-                stack(:, :, 1) = meanProj/ max(meanProj(:))*(2^16-1);
+                proj = sum(stack(:, :, 2:end), 3);
+                stack(:, :, 1) = proj/ max(proj(:))*(2^16-1);
 
                 label = regexprep(metadata_{1,2},'_frame\d*','');
 
                 fmt = '%s_time%.0f_pos%d_ch%d_frame%06d_Nz%d.tif';
+                
+                
                 filename = sprintf(fmt, label, metadata_{1,5}, pos, metadata_{1, 4}, frame, size(stack, 3)-1);
 
                 if ~exist(fullfile(outputDir, filename), 'file')
@@ -5484,6 +5530,139 @@ function importCustomTiffPushbutton_Callback(hObject, eventdata, handles)
     handles.settings.displayMode = '';
 
 
+
+
+function pushbutton_tools_transferChannels_Callback(hObject, eventdata, handles)
+toggleBusyPointer(handles, true)
+transferSegmentation(handles);
+analyzeDirectory(hObject, eventdata, handles);
+toggleBusyPointer(handles, false)
+
+
+
+function transferChannel2_Callback(hObject, eventdata, handles)
+handles = checkAndStoreInput(handles, hObject, 'inputType', 'numeric', 'condition', 'integer', 'range', [1, numel(handles.uicontrols.popupmenu.channel.String)]);
+
+function transferChannel2_CreateFcn(hObject, eventdata, handles)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function transferChannel1_Callback(hObject, eventdata, handles)
+handles = checkAndStoreInput(handles, hObject, 'inputType', 'array', 'condition', 'integer', 'range', [1, numel(handles.uicontrols.popupmenu.channel.String)]);
+
+function transferChannel1_CreateFcn(hObject, eventdata, handles)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_parameterCombination_newParamName_Callback(hObject, eventdata, handles)
+presentParams = handles.uicontrols.popupmenu.popupmenu_parameterCombination_ParameterChoice.String;
+if any(strcmp(presentParams, get(hObject,'String')))
+   msgbox('Parameter name already present. If you proceed, this property will be overwritten by new results.', 'Warning');
+end
+storeValues(hObject, eventdata, handles);
+
+
+
+function edit_parameterCombination_newParamName_CreateFcn(hObject, eventdata, handles)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function popupmenu_parameterCombination_ParameterChoice_Callback(hObject, eventdata, handles)
+
+
+
+function popupmenu_parameterCombination_ParameterChoice_CreateFcn(hObject, eventdata, handles)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_parameterCombination_formula_Callback(hObject, eventdata, handles)
+storeValues(hObject, eventdata, handles);
+
+
+
+function edit_parameterCombination_formula_CreateFcn(hObject, eventdata, handles)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function pushbutton_parameterCombination_add_Callback(hObject, eventdata, handles)
+params = handles.uicontrols.popupmenu.popupmenu_parameterCombination_ParameterChoice.String;
+choice = handles.uicontrols.popupmenu.popupmenu_parameterCombination_ParameterChoice.Value;
+parameterToAdd = params{choice};
+strCom = handles.uicontrols.edit.edit_parameterCombination_formula.String;
+if isempty(strCom)
+    strCom = strcat('{', parameterToAdd, '}');
+else
+    strCom = strcat(strCom,'{', parameterToAdd, '}');
+end
+handles.uicontrols.edit.edit_parameterCombination_formula.String = strCom;
+edit_parameterCombination_formula_Callback(handles.uicontrols.edit.edit_parameterCombination_formula, eventdata, handles);
+
+
+function pushbutton_parameterCombination_testExpression_Callback(hObject, eventdata, handles)
+filterExpr = handles.uicontrols.edit.edit_parameterCombination_formula.String;
+try
+    formulaRaw = filterExpr;
+    try
+        fields = extractBetween(formulaRaw,'{','}');
+    catch
+        fields = regexp(formulaRaw, '{.*?}', 'match');
+        fields = cellfun(@(x) x(2:end-1), fields, 'UniformOutput', false);
+    end
+    formula = formulaRaw;
+    if ~isempty(fields)
+        for i = 1:numel(fields)
+            formula = strrep(formula, ['{', fields{i}, '}'], '1');
+        end
+    else
+        formula = formulaRaw;
+    end
+
+    eval(sprintf('test = %s;', formula));
+    if isnumeric(test)|| islogical(test)
+        success = 1;
+    else
+        success = 0;
+    end
+    errorStr = 'Expression (%s) is not valid!';
+catch err
+    errorStr = sprintf('Expression (%s) is not valid! Error: %s', filterExpr, err.message);
+    success = 0;
+end
+if success
+    msgbox('Formula is valid.') 
+else
+    uiwait(msgbox(errorStr, 'Error', 'error', 'modal'));
+end
+
+
+
+function edit246_Callback(hObject, eventdata, handles)
+
+
+
+function edit246_CreateFcn(hObject, eventdata, handles)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
 
 
 

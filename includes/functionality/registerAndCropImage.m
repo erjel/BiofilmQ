@@ -21,12 +21,18 @@
 function imgfilter = registerAndCropImage(imgfilter, params, metadata)
 
 
+if params.declumpingMethod~=3
+   method = 'linear'; 
+else
+    method = 'nearest';
+end
+
 if params.imageRegistration
     try
         if size(imgfilter, 3) == 1
-            imgfilter = performImageAlignment2D(imgfilter, metadata, 1);
+            imgfilter = performImageAlignment2D(imgfilter, metadata, method, 1);
         else
-            imgfilter = performImageAlignment3D(imgfilter, metadata, 1);
+            imgfilter = performImageAlignment3D(imgfilter, metadata, method, 1);
         end
     catch
         disp(['Image is not registered!']);

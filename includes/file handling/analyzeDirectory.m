@@ -845,11 +845,26 @@ if ~isempty(handles.settings.lists.files_cells) && ~isempty(handles.settings.lis
                 fNames = {};
             end
         end
+        
         combinedNames = unique(combinedNames);
+        combinedNames_sub = setdiff(combinedNames, {'Centroid', 'BoundingBox', 'Cube_CenterCoord', 'Orientation_Matrix', 'MinBoundBox_Cornerpoints'});
+        combinedNames = union({'ID', 'CentroidCoordinate_x', 'CentroidCoordinate_y', 'CentroidCoordinate_z'}, combinedNames_sub);
+        
+        fNames = setdiff(fNames, {'Centroid', 'BoundingBox', 'Cube_CenterCoord', 'Orientation_Matrix', 'MinBoundBox_Cornerpoints'});
+        
+        if ~isempty(fNames)
+            fNames = {'ID', 'Distance_FromSubstrate', 'RandomNumber', fNames{:}}';
+        else
+            fNames = {'ID', 'Distance_FromSubstrate', 'RandomNumber', 'Timepoint', combinedNames{:}}';
+        end
+        
         
         if ~isempty(combinedNames)
             set(handles.uicontrols.popupmenu.filter_parameter, 'String', combinedNames);
+            set(handles.uicontrols.popupmenu.tagCells_parameter, 'String', combinedNames);
+            set(handles.uicontrols.popupmenu.popupmenu_parameterCombination_ParameterChoice, 'String', combinedNames_sub);
         else
+            set(handles.uicontrols.popupmenu.popupmenu_parameterCombination_ParameterChoice, 'String', 'no parameters present');
             set(handles.uicontrols.popupmenu.filter_parameter, 'String', 'no parameters present');
         end
         
@@ -858,25 +873,12 @@ if ~isempty(handles.settings.lists.files_cells) && ~isempty(handles.settings.lis
         
         for i = 1:length(intFields)
             if ~isempty(intFields{i})
-                set(handles.uicontrols.popupmenu.filter_parameter, 'Value', i)
+                set(handles.uicontrols.popupmenu.filter_parameter, 'Value', i);
+                set(handles.uicontrols.popupmenu.tagCells_parameter, 'Value', i);
                 break;
             end
         end
         
-        deleteInd = strcmp(fNames, 'Centroid');
-        fNames(find(deleteInd)) = [];
-        deleteInd = strcmp(fNames, 'BoundingBox');
-        fNames(find(deleteInd)) = [];
-        deleteInd = strcmp(fNames, 'Orientation_Matrix');
-        fNames(find(deleteInd)) = [];
-        deleteInd = strcmp(fNames, 'Cube_CenterCoord');
-        fNames(find(deleteInd)) = [];
-        
-        if ~isempty(fNames)
-            fNames = {'ID', 'Distance_FromSubstrate', 'RandomNumber', fNames{:}}';
-        else
-            fNames = {'ID', 'Distance_FromSubstrate', 'RandomNumber', 'Timepoint', combinedNames{:}}';
-        end
         
         tableData = [fNames num2cell(true(size(fNames)))];
         set(handles.uitables.cellParametersStoreVTK, 'Data', tableData);

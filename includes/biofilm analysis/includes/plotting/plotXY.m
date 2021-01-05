@@ -41,10 +41,10 @@ removeZOffset = 0;
 
 plotErrorbars = get(handles.handles_analysis.uicontrols.checkbox.checkbox_errorbars, 'Value');
 
-normalizeByBiomass = false;
+normalizeByBiovolume = false;
 switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_averaging, 'Value')
     case 1
-        normalizeByBiomass = true;
+        normalizeByBiovolume = true;
         averagingFcn = '';
     case 2
         averagingFcn = 'nanmean';
@@ -66,12 +66,12 @@ if databaseValue == 1
     filterExp = get(handles.handles_analysis.uicontrols.edit.edit_filterField, 'String');
 else
     filterExp = '';
-    normalizeByBiomass = false;
+    normalizeByBiovolume = false;
 end
 
 publication = true;
 
-legendStr = {};
+yLegend = {};
 
 if get(handles.handles_analysis.uicontrols.checkbox.checkbox_clusterBiofilm, 'Value') && databaseValue ~= 2
     if ~isfield(biofilmData.data(end).stats, 'IsRelatedToFounderCells')
@@ -103,7 +103,7 @@ filename = [field_xaxis, ' vs ' field_yaxis];
 
 switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_averaging, 'Value')
     case 1
-        method = 'normalized by biomass';
+        method = 'normalized by biovolume';
     case 2
         method = 'mean';
     case 3
@@ -114,17 +114,6 @@ switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_averaging, 'V
         method = 'min';
     case 6
         method = 'max';
-end
-
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoXRange, 'Value')
-    [xLabel, xUnit, xRange] = returnUnitLabel(field_xaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodX, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeX, 'Value'));
-    set(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String', num2str(xRange, '%.2g %.2g'));
-    set(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String', xLabel);
-    set(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String', xUnit);
-else
-    xRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_xRange, 'String'));
-    xLabel = get(handles.handles_analysis.uicontrols.edit.edit_xLabel, 'String');
-    xUnit = get(handles.handles_analysis.uicontrols.edit.edit_xLabel_unit, 'String');
 end
 
 y_type = field_xaxis;
@@ -139,28 +128,6 @@ if exist(fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' '
         return;
     end
 end
-
-yFields = strtrim(strsplit(field_yaxis, ','));
-nFields = numel(yFields);
-yLabelEntered = '';
-yUnitEntered = '';
-yRangeEntered = [];
-if get(handles.handles_analysis.uicontrols.checkbox.checkbox_autoYRange, 'Value')
-    if nFields == 1
-        [yLabelEntered, yUnitEntered, yRange] = returnUnitLabel(field_yaxis, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodY, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY, 'Value'));
-        set(handles.handles_analysis.uicontrols.edit.edit_yRange, 'String', num2str(yRange, '%.2f %.2f'));
-    end
-    set(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String', yLabelEntered);
-    set(handles.handles_analysis.uicontrols.edit.edit_yLabel_unit, 'String', yUnitEntered);
-else
-    yRange = str2num(get(handles.handles_analysis.uicontrols.edit.edit_yRange, 'String'));
-    yLabel = get(handles.handles_analysis.uicontrols.edit.edit_yLabel, 'String');
-    yUnit = get(handles.handles_analysis.uicontrols.edit.edit_yLabel_unit, 'String');
-    yRangeEntered = yRange;
-    yLabelEntered = yLabel;
-    yUnitEntered = yUnit;
-end
-
 
 if get(handles.handles_analysis.uicontrols.checkbox.useRefTimepoint, 'Value')
     timeShift = biofilmData.timeShift/60/60;
@@ -182,11 +149,13 @@ else
     h_ax = axes('Parent', h);
 end
 
-yUnit = cell(1, nFields);
-yLabel = cell(1, nFields);
-legendStr = cell(1, nFields);
+yFields = strtrim(strsplit(field_yaxis, ','));
+nFields = numel(yFields);
+
+cellX = cell(nFields, 1);
+cellY = cell(nFields, 1);
+
 for field = 1:nFields
-    [yLabel{field}, yUnit{field}, yRange, legendStr{field}] = returnUnitLabel(yFields{field}, biofilmData, database, get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodY, 'Value'), get(handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY, 'Value'));
     
     field_yaxis = yFields{field};
     
@@ -202,45 +171,31 @@ for field = 1:nFields
         'averagingFcn', averagingFcn,...
         'filterExpr', filterExp,...
         'clusterBiofilm', clusterBiofilm,...
-        'normalizeByBiomass', normalizeByBiomass);
+        'normalizeByBiovolume', normalizeByBiovolume);
     
-    if nFields < 3
-        if field == 1
+
+
             
-            if (strcmp(method, 'mean') || strcmp(method, 'median')) && ~isempty(yRange)
-                try
-                    ylim(h_ax, [yRange(1) yRange(2)])
-                catch
-                    ylim(h_ax, [yRange(1)-1 yRange(1)+1])
-                end
-            end
-        end
-        
-        if nFields == 2 && field ==2
-            
-            if (strcmp(method, 'mean') || strcmp(method, 'median')) && ~isempty(yRange)
-                try
-                    ylim(h_ax, [yRange(1) yRange(2)])
-                catch
-                    ylim(h_ax, [yRange(1)-1 yRange(1)+1])
-                end
-            end
-            yyaxis(h_ax, 'right');
-        end
+    if field == 2 && nFields == 2
+        yyaxis(h_ax, 'right');
     end
-    
-    
+
     if plotErrorbars
+        cellX{field} = X + [-1; 1] .* dX;
+        cellY{field} = Y + [-1; 1] .* dY;
+        
         if sum(dX) == 0
             errorbar(h_ax, X, Y, dY(1,:), dY(2,:), '.')
         else
             errorbar(h_ax, X, Y, dY(1,:), dY(2,:), dX(1,:), dX(2,:), '.')
         end
     else
-        
-        
+        cellX{field} = X;
+        cellY{field} = Y;
     end
+    
     set(h_ax, 'NextPlot', 'add');
+    
     switch get(handles.handles_analysis.uicontrols.popupmenu.popupmenu_plotStyle, 'Value')
         case 1
             scatter(h_ax, X, Y, 'filled')
@@ -254,78 +209,99 @@ for field = 1:nFields
         case 5
             bar(h_ax, X, Y);
     end
-    
+
 end
 
-switch nFields
-    case 1
-    yLabel = yLabel{1};
-    yUnit = yUnit{1};
-    
-    if strcmp(yUnit, '')
-        ylabel(h_ax, yLabel)
+
+
+[xLabel, yLabels] = getLabelsFromGUI(handles, {field_xaxis, '', '', ''});
+[xUnit, yUnits] = getUnitsFromGUI(handles, {field_xaxis,  '', '', ''});
+[xRange, yRanges] = getRangeFromGUI(handles, {field_xaxis, '', '', ''}, {cellX, cellY, {}, {}});
+
+xRange = str2num(xRange);
+
+yLabels = strtrim(strsplit(yLabels, ','));
+yUnits = strtrim(strsplit(yUnits, ','));
+yRanges = strtrim(strsplit(yRanges, ','));
+
+
+if numel(yLabels) ~= nFields  
+    yLabels = cellfun(@returnUnitLabel, yFields, 'un', 0);
+    yLabels_str = join(yLabels, ', ');
+    handles.handles_analysis.uicontrols.edit.edit_yLabel.String = yLabels_str{:};
+        
+end
+
+if numel(yUnits) ~= nFields
+    [~, yUnits] = cellfun(@returnUnitLabel, yFields, 'un', 0);
+    yUnits_str = join(yUnits, ', ');
+    handles.handles_analysis.uicontrols.edit.edit_yLabel_unit.String = yUnits_str{:};
+end
+
+if sum(~cellfun(@isempty, yRanges)) ~= nFields
+    [~, ~, yRanges] = ...
+        cellfun(@(yfield) ...
+            returnUnitLabel(...
+                 yfield, ...
+                 biofilmData, ...
+                 database, ...
+                 handles.handles_analysis.uicontrols.popupmenu.popupmenu_rangeMethodY.Value, ...
+                 handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY.Value), ...
+             yFields, 'un', 0);
+     yRanges_str = cellfun(@(range) num2str(range, '%.2f %.2f'), yRanges, 'un', 0);
+     yRanges_str = join(yRanges_str, ', ');
+     handles.handles_analysis.uicontrols.edit.edit_yRange.String = yRanges_str{:};
+else
+    if ~any(cellfun(@isempty , yRanges))
+        yRanges = cellfun(@str2num, yRanges, 'un', 0);
     else
-        ylabel(h_ax, [yLabel, ' ', yUnit])
-    end
-
-    case 2 
-        if isempty(yLabelEntered) 
-            yyaxis(h_ax, 'left');
-            if strcmp(yUnit{1}, '')
-                ylabel(h_ax, yLabel{1})
-            else
-                ylabel(h_ax, [yLabel{1}, ' ', yUnit{1}])
-            end
-            
-            yyaxis(h_ax, 'right');
-            if strcmp(yUnit{2}, '')
-                ylabel(h_ax, yLabel{2})
-            else
-                ylabel(h_ax, [yLabel{2}, ' ', yUnit{2}])
-            end
-        else
-            yyaxis(h_ax, 'left');
-            if strcmp(yUnitEntered, '')
-                ylabel(h_ax, yLabelEntered)
-            else
-                ylabel(h_ax, [yLabelEntered, ' ', yUnitEntered])
-            end
-        end
-        
-    otherwise
-        if strcmp(yUnitEntered, '')
-            ylabel(h_ax, yLabelEntered)
-        else
-            ylabel(h_ax, [yLabelEntered, ' ', yUnitEntered])
-        end
-        
-end
-
-if (~isempty(yRange) && nFields == 1) && ((strcmp(method, 'mean') || strcmp(method, 'median') || normalizeByBiomass))
-    try
-        ylim(h_ax, [yRange(1) yRange(2)])
-    catch
-        ylim(h_ax, [yRange(1)-1 yRange(1)+1])
+        yRanges = cell(nFields, 1);
     end
 end
 
-if ~isempty(yRangeEntered)
-    if nFields > 1
-        yyaxis(h_ax, 'left');
-        try
-            ylim(h_ax, [yRangeEntered(1) yRangeEntered(2)])
-        catch
-            ylim(h_ax, [yRangeEntered(1)-1 yRangeEntered(1)+1])
-        end
-        yyaxis(h_ax, 'right');
+yLegend = cellfun(@(label, unit) sprintf('%s %s', label, unit), yLabels, yUnits, 'un', 0);
+
+if nFields == 1
+    ylabel(h_ax, yLegend{1});
+    if (~handles.handles_analysis.uicontrols.checkbox.checkbox_autoYRange.Value || ...
+            handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY.Value) && ...
+            ~isempty(yRanges{1})
+        
+        ylim(h_ax, [yRanges{1}(1) yRanges{1}(2)])
     end
-    try
-        ylim(h_ax, [yRangeEntered(1) yRangeEntered(2)])
-    catch
-        ylim(h_ax, [yRangeEntered(1)-1 yRangeEntered(1)+1])
-    end
+
+elseif nFields == 2
     
+    yyaxis(h_ax, 'left');
+    ylabel(h_ax, yLegend{1});
+    if (~handles.handles_analysis.uicontrols.checkbox.checkbox_autoYRange.Value || ...
+            handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY.Value) && ...
+            ~isempty(yRanges{1})
+        
+        ylim(h_ax, [yRanges{1}(1) yRanges{1}(2)])
+    end
+            
+    yyaxis(h_ax, 'right');
+    ylabel(h_ax, yLegend{2});
+    if (~handles.handles_analysis.uicontrols.checkbox.checkbox_autoYRange.Value || ...
+            handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY.Value) && ...
+            ~isempty(yRanges{2})
+        
+        ylim(h_ax, [yRanges{2}(1) yRanges{2}(2)])
+    end
+else
+    legend(yLegend);
+    if (~handles.handles_analysis.uicontrols.checkbox.checkbox_autoYRange.Value || ...
+            handles.handles_analysis.uicontrols.checkbox.checkbox_returnTrueRangeY.Value) && ...
+            any(~cellfun(@isempty, yRanges))
+        
+        ylim(h_ax, [min(cellfun(@(yRange) yRange(1), yRanges)) ...
+                    max(cellfun(@(yRange) yRange(2), yRanges))]);
+    end
+        
 end
+
+
 
 try
     xlim(h_ax, [xRange(1)-0.05*diff(xRange) xRange(2)+0.05*diff(xRange)]);
@@ -351,7 +327,7 @@ end
 
 box(h_ax, 'on');
 if nFields > 2
-    legend(legendStr);
+    legend(yLegend);
 end
 
 if handles.handles_analysis.uicontrols.checkbox.checkbox_applyCustom2.Value
@@ -395,11 +371,7 @@ end
 
 
 print(h, '-dpng','-r300',fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, ' ', method, ' ', y_type, '.png']));
-if isunix
-    print(h, '-depsc','-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, ' ', method, ' ', y_type, '.eps']));
-else
-    print(h, '-depsc ','-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, ' ', method, ' ', y_type, '.eps']));
-end
+print(h, '-depsc','-r300', '-painters' ,fullfile(directory, [handles.settings.databaseNames{databaseValue}, ' ', filename, ' ', method, ' ', y_type, '.eps']));
 end
 
 

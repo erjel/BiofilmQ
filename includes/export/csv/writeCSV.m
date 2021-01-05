@@ -27,6 +27,8 @@ end
 if isfield(objects, 'globalMeasurements')
     badFields = [];
     fNames = fieldnames(objects.globalMeasurements);
+    is_struct = cellfun(@(x) isstruct(objects.globalMeasurements.(x)), fNames);
+    fNames = fNames(~is_struct);
     
     header1 = [{'Ncells', 'Timepoint'}, fNames'];
     header2 = cell(1, numel(fNames)+2);
