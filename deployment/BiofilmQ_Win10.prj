@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="3432320602" file="C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10.prj" location="C:\Users\jelli\src\BiofilmQ\deployment" name="BiofilmQ_Win10" preferred-package-location="C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="3432320602" file="${PROJECT_ROOT}\BiofilmQ_Win10.prj" location="${PROJECT_ROOT}" name="BiofilmQ_Win10" preferred-package-location="${PROJECT_ROOT}\BiofilmQ_Win10" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>BiofilmQ</param.appname>
     <param.icon>${PROJECT_ROOT}\BiofilmQ_Win10_resources\icon.ico</param.icon>
     <param.icons>
@@ -17,11 +17,11 @@
 BiofilmQ dividies bacterial biovolume obtained by threshold-based 3D segmentation approaches into cubic pseudo-cells. Each cube is treated as a single cell with properties from fluorescent, architectural, spatial and many more measurements. By using a cube-based approach, you can reach pseudo-single-cell resolution.
 If your experiment includes multi-color image stacks, you can generate flow-cytometry-like datasets and analyse spatial properties of gene expression or subpopulation migration without optical single-cell resolution.
 The easy-to-use analysis features enable you to generate high-quality data visualization without any programming skills.</param.description>
-    <param.screenshot>C:\Users\jelli\src\BiofilmQ\includes\layout\logo_large.png</param.screenshot>
+    <param.screenshot>${PROJECT_ROOT}\..\includes\layout\logo_large.png</param.screenshot>
     <param.guid />
     <param.installpath.string>\BiofilmQ\</param.installpath.string>
     <param.installpath.combo>option.installpath.appdata</param.installpath.combo>
-    <param.logo>C:\Users\jelli\src\BiofilmQ\includes\layout\logo_large_half.png</param.logo>
+    <param.logo>${PROJECT_ROOT}\..\includes\layout\logo_large_half.png</param.logo>
     <param.install.notes />
     <param.target.install.notes />
     <param.intermediate>${PROJECT_ROOT}\BiofilmQ_Win10\for_testing</param.intermediate>
@@ -79,79 +79,79 @@ The easy-to-use analysis features enable you to generate high-quality data visua
       <param.example />
     </unset>
     <fileset.main>
-      <file>C:\Users\jelli\src\BiofilmQ\BiofilmQ.m</file>
+      <file>${PROJECT_ROOT}\..\BiofilmQ.m</file>
     </fileset.main>
     <fileset.resources>
-      <file>C:\Users\jelli\src\BiofilmQ\BiofilmQ.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\about.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\biofilm analysis</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\biofilmQ_version.txt</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\deconvolution</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\export</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\file handling</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\functionality</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\help</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\help\gridding.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\help\labels.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\help\none.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\image processing</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\image registration</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\logo.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\logo_large.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash01.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash02.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash03.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash04.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash05.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash06.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash07.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash08.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash09.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash10.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash11.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash12.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash13.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash14.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash15.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash16.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash17.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash18.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash19.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash20.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash21.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash22.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash23.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash24.png</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\welcome.html</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\object processing</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\object processing\actions\user-defined parameters\template.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\performance</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\tools</file>
+      <file>${PROJECT_ROOT}\..\BiofilmQ.m</file>
+      <file>${PROJECT_ROOT}\..\includes\about.m</file>
+      <file>${PROJECT_ROOT}\..\includes\biofilm analysis</file>
+      <file>${PROJECT_ROOT}\..\includes\biofilmQ_version.txt</file>
+      <file>${PROJECT_ROOT}\..\includes\deconvolution</file>
+      <file>${PROJECT_ROOT}\..\includes\export</file>
+      <file>${PROJECT_ROOT}\..\includes\file handling</file>
+      <file>${PROJECT_ROOT}\..\includes\functionality</file>
+      <file>${PROJECT_ROOT}\..\includes\help</file>
+      <file>${PROJECT_ROOT}\..\includes\help\gridding.png</file>
+      <file>${PROJECT_ROOT}\..\includes\help\labels.png</file>
+      <file>${PROJECT_ROOT}\..\includes\help\none.png</file>
+      <file>${PROJECT_ROOT}\..\includes\image processing</file>
+      <file>${PROJECT_ROOT}\..\includes\image registration</file>
+      <file>${PROJECT_ROOT}\..\includes\layout</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\logo.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\logo_large.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash01.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash02.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash03.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash04.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash05.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash06.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash07.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash08.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash09.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash10.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash11.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash12.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash13.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash14.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash15.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash16.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash17.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash18.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash19.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash20.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash21.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash22.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash23.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\splashScreen\animation\splash24.png</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\welcome.html</file>
+      <file>${PROJECT_ROOT}\..\includes\object processing</file>
+      <file>${PROJECT_ROOT}\..\includes\object processing\actions\user-defined parameters\template.m</file>
+      <file>${PROJECT_ROOT}\..\includes\performance</file>
+      <file>${PROJECT_ROOT}\..\includes\tools</file>
     </fileset.resources>
     <fileset.package />
     <fileset.depfun>
-      <file>C:\Users\jelli\src\BiofilmQ\BiofilmQ.fig</file>
-      <file>C:\Users\jelli\src\BiofilmQ\directory.mat</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\about.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\addIcon.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\addPanelToBoxPanel.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\centerText.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\centerTexts.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\changeFontSize.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\createJavaTable.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\loadAnalysisPanel.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\populateTabs.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\replaceUIPanel.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\restylePanel.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\sortTabs.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\toggleUIElements.m</file>
-      <file>C:\Users\jelli\src\BiofilmQ\includes\layout\uicomponent.m</file>
+      <file>${PROJECT_ROOT}\..\BiofilmQ.fig</file>
+      <file>${PROJECT_ROOT}\..\directory.mat</file>
+      <file>${PROJECT_ROOT}\..\includes\about.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\addIcon.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\addPanelToBoxPanel.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\centerText.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\centerTexts.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\changeFontSize.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\createJavaTable.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\loadAnalysisPanel.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\populateTabs.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\replaceUIPanel.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\restylePanel.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\sortTabs.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\toggleUIElements.m</file>
+      <file>${PROJECT_ROOT}\..\includes\layout\uicomponent.m</file>
     </fileset.depfun>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\BiofilmQ_Win10\for_testing" name="splash.png" optional="false">C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10\for_testing\splash.png</file>
-      <file location="${PROJECT_ROOT}\BiofilmQ_Win10\for_testing" name="readme.txt" optional="true">C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10\for_testing\readme.txt</file>
-      <file location="${PROJECT_ROOT}\BiofilmQ_Win10\for_testing" name="BiofilmQ.exe" optional="false">C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10\for_testing\BiofilmQ.exe</file>
+      <file location="${PROJECT_ROOT}\BiofilmQ_Win10\for_testing" name="splash.png" optional="false">${PROJECT_ROOT}\BiofilmQ_Win10\for_testing\splash.png</file>
+      <file location="${PROJECT_ROOT}\BiofilmQ_Win10\for_testing" name="readme.txt" optional="true">${PROJECT_ROOT}\BiofilmQ_Win10\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\BiofilmQ_Win10\for_testing" name="BiofilmQ.exe" optional="false">${PROJECT_ROOT}\BiofilmQ_Win10\for_testing\BiofilmQ.exe</file>
     </build-deliverables>
     <workflow />
     <matlab>
