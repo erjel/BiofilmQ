@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="2645544854" file="C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10.prj" location="C:\Users\jelli\src\BiofilmQ\deployment" name="BiofilmQ_Win10" preferred-package-location="C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="3432320602" file="C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10.prj" location="C:\Users\jelli\src\BiofilmQ\deployment" name="BiofilmQ_Win10" preferred-package-location="C:\Users\jelli\src\BiofilmQ\deployment\BiofilmQ_Win10" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>BiofilmQ</param.appname>
     <param.icon>${PROJECT_ROOT}\BiofilmQ_Win10_resources\icon.ico</param.icon>
     <param.icons>
@@ -83,10 +83,20 @@ The easy-to-use analysis features enable you to generate high-quality data visua
     </fileset.main>
     <fileset.resources>
       <file>C:\Users\jelli\src\BiofilmQ\BiofilmQ.m</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\about.m</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\biofilm analysis</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\biofilmQ_version.txt</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\deconvolution</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\export</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\file handling</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\functionality</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\help</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\help\gridding.png</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\help\labels.png</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\help\none.png</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\image processing</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\image registration</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\layout</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\layout\logo.png</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\layout\logo_large.png</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash01.png</file>
@@ -114,7 +124,10 @@ The easy-to-use analysis features enable you to generate high-quality data visua
       <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash23.png</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\layout\splashScreen\animation\splash24.png</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\layout\welcome.html</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\object processing</file>
       <file>C:\Users\jelli\src\BiofilmQ\includes\object processing\actions\user-defined parameters\template.m</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\performance</file>
+      <file>C:\Users\jelli\src\BiofilmQ\includes\tools</file>
     </fileset.resources>
     <fileset.package />
     <fileset.depfun>
