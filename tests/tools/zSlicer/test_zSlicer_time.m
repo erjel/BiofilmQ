@@ -2,10 +2,6 @@ function tests = test_zSlicer_time
     tests = functiontests(localfunctions);
 end
 
-function teardown(testCase)  % do not change function name
-    close('all');
-end
-
 %% Test zSlicer 2D
 function test2D_inputData(testCase)
     maxZ = 1;
@@ -17,7 +13,8 @@ function test2D_inputData(testCase)
     metadata.data.scaling.dxy = 1;
     metadata.data.scaling.dz = 1;
     file = 1;
-    zSlicer_time(im, maxZ, handles.settings.lists.files_tif, timepoints, workingDir, metadata.data.scaling, file);
+    h = zSlicer_time(im, maxZ, handles.settings.lists.files_tif, timepoints, workingDir, metadata.data.scaling, file);
+    close(h.figure1)
 end
 
 %% Test zSlicer 3D
@@ -30,5 +27,6 @@ function test3D_inputData(testCase)
     metadata.data.scaling.dxy = 1;
     metadata.data.scaling.dz = 1;
     file = 1;
-    zSlicer_time(im, maxZ, handles.settings.lists.files_tif, timepoints, workingDir, metadata.data.scaling, file);
+    h = zSlicer_time(im, maxZ, handles.settings.lists.files_tif, timepoints, workingDir, metadata.data.scaling, file);
+    close(h.figure1)
 end

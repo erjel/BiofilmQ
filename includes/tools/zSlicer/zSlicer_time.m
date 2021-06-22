@@ -74,7 +74,19 @@ data{varargin{7}} = im;
 handles.data = data;
 handles.input = varargin;
 
-set(handles.slider_z, 'Value', 1, 'Min', 1, 'Max', handles.maxZ, 'SliderStep', [1/(handles.maxZ-1), 1/(handles.maxZ-1)]);
+
+
+handles.slider_z.Value = 1;
+handles.slider_z.Min = 1;
+handles.slider_z.Max = handles.maxZ;
+
+if handles.slider_z.Max == 1
+    handles.slider_z.Visible = 'off';
+    handles.text7.Visible = 'off';
+else
+     handles.slider_z.SliderStep = [1/(handles.maxZ-1), 1/(handles.maxZ-1)];
+end
+
 sliderStep = 1/(numel(varargin{3})-1) * [1 1];
 if ~sliderStep(1) || isinf(sliderStep(1))
     sliderStep = [1 1];
