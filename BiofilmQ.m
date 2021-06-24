@@ -372,6 +372,7 @@ handles = populateTabs(handles, 'uipanel_workflow_segmentation_mergeAndTransfer'
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.25)
 
+handles.layout.uipanels.uipanel_workflow_dataExport_seg = uipanel_workflow_dataExport_seg(handles);
 
 handles.layout.tabs.workflow_exportTabs = uitabgroup('Parent', handles.layout.uipanels.uipanel_workflow_dataExport_methodTabs.Parent, 'TabLocation', 'top', 'units', 'characters', 'Position', get(handles.layout.uipanels.uipanel_workflow_dataExport_methodTabs, 'Position'));
 delete(handles.layout.uipanels.uipanel_workflow_dataExport_methodTabs)
