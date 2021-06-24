@@ -380,6 +380,7 @@ delete(handles.layout.uipanels.uipanel_workflow_dataExport_methodTabs)
 handles = populateTabs(handles, 'uipanel_workflow_dataExport_vtk','workflow_exportTabs');
 handles = populateTabs(handles, 'uipanel_workflow_dataExport_fcs','workflow_exportTabs');
 handles = populateTabs(handles, 'uipanel_workflow_dataExport_csv','workflow_exportTabs');
+handles = populateTabs(handles, 'uipanel_workflow_dataExport_seg','workflow_exportTabs');
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.3)
 
@@ -477,6 +478,7 @@ set(handles.splashScreenHandle,'ProgressRatio', 0.6)
 handles = replaceUIPanel(handles, 'uipanel_workflow_dataExport');
 handles = replaceUIPanel(handles, 'uipanel_workflow_dataExport_vtk');
 handles = replaceUIPanel(handles, 'uipanel_workflow_dataExport_fcs');
+handles = replaceUIPanel(handles, 'uipanel_workflow_dataExport_seg');
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.65)
 

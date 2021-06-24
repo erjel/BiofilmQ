@@ -1,36 +1,47 @@
 function p = uipanel_workflow_dataExport_seg(handles)
 
-    test = true;
+    test = false;
     
     padding = 8;
     spacing = 8;
     objectHeight = 22;
     
-    p = uipanel('Title', 'Export Segmentation (tif)');
+    p = uipanel('Title', 'Segmentation (TIF-files)');
     
     if test
         f = figure(1);
         p.Parent = f;
+    else
+        p.Parent = handles.mainFig;
     end
    
     %% Elements
-    handles.uicontrols.pushbutton.dataExport_seg_export = ...
+    handles.uicontrols.pushbutton.pushbutton_dataExport_seg_export = ...
         uicontrol( ...
         'Tag', 'dataExport_seg_export_pushbutton', ...
         'Style', 'pushbutton', ...
-        'String', 'Export' ...
-        );
+        'String', 'Export', ...
+        'FontSize', 10 ...
+    );
+    
+    handles.uicontrols.text.text_workflow_dataExport_seg_descr = ...
+        uicontrol( ...
+        'Tag', 'dataExport_seg_descr', ...
+        'Style', 'text', ...
+        'String', 'Object segmentations can be exported into the TIF-format', ...
+        'FontAngle', 'italic', ...
+        'HorizontalAlignment', 'left' ...
+    );
 
-    %% Layout        
-    v1 = uix.VBox('Parent', p, 'Padding', 0, 'Spacing', spacing);
-        v1_h1 = uix.HBox('Parent', v1, 'Padding', 0, 'Spacing', spacing);
-            uix.VBox('Parent', v1_h1, 'Tag', 'EmptyPlaceholder');
-            handles.uicontrols.pushbutton.dataExport_seg_export.Parent = v1_h1;
+    %% Layout
+    h = uix.HBox('Parent', p);
+    handles.uicontrols.text.text_workflow_dataExport_seg_descr.Parent = h;
+    h_button = uix.HButtonBox('Parent', h, 'Spacing', spacing, 'HorizontalAlignment', 'right', 'VerticalAlignment', 'top', 'ButtonSize', [150 objectHeight]);
+    handles.uicontrols.pushbutton.pushbutton_dataExport_seg_export.Parent = h_button;
+    
 
-        v1_h1.Widths = [-1, 150];
-    v1.Heights =  0.85*objectHeight*ones(numel(v1.Children));
 
     %% Callbacks
-    handles.uicontrols.pushbutton.dataExport_seg_export.Callback = ...
+    handles.uicontrols.pushbutton.pushbutton_dataExport_seg_export.Callback = ...
         @(hObject, eventdata) dataExport_seg_export_Callback(hObject, eventdata, guidata(handles.mainFig)); 
 end
