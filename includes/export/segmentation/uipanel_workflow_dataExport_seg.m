@@ -15,9 +15,10 @@
 %
 %%
 
-function p = uipanel_workflow_dataExport_seg(handles)
-
-    test = false;
+function p = uipanel_workflow_dataExport_seg(handles, test)
+    if nargin == 1
+        test = false;
+    end
     
     padding = 8;
     spacing = 8;
