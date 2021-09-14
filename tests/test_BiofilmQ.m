@@ -16,8 +16,8 @@
 %%
 
 function tests = test_BiofilmQ
-    addpath('./')
-    addpath(genpath('includes'))
+    addpath(pwd);
+    addpath(genpath('includes'));
     tests = functiontests(localfunctions);
 end
 

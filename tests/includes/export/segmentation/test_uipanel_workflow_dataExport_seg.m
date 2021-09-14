@@ -16,6 +16,8 @@
 %%
 
 function tests = test_uipanel_workflow_dataExport_seg
+    addpath(pwd);
+    addpath(genpath('includes'));
     tests = functiontests(localfunctions);
 end
 
