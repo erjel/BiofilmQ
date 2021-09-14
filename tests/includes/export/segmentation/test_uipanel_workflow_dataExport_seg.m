@@ -16,7 +16,11 @@
 %%
 
 function tests = test_uipanel_workflow_dataExport_seg
-    tests = functiontests(localfunctions);
+    if isempty(javachk('awt'))
+        tests = functiontests(localfunctions);
+    else
+        tests = functiontests({@test_skip});
+    end
 end
 
 %% Overloaded test setup functions
@@ -73,6 +77,9 @@ function create_mock_files(size)
 end
 
 %% Actual tests
+function test_skip(testCase)
+end
+
 function test_emptydir(testCase)
     handles = testCase.TestData.handles;
 
