@@ -16,8 +16,6 @@
 %%
 
 function tests = test_BiofilmQ
-    addpath('./')
-    addpath(genpath('includes'))
     tests = functiontests(localfunctions);
 end
 
@@ -78,7 +76,7 @@ function setup(testCase)
         
  
     handles.uitables.files = uitable();
-    if ~isempty(javachk('awt'))
+    if usejava('awt')
         handles.java.files_javaHandle = findjobj(handles.uitables.files);
         jscrollpane = javaObjectEDT(handles.java.files_javaHandle);
         viewport    = javaObjectEDT(jscrollpane.getViewport);
