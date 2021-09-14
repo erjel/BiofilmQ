@@ -16,11 +16,7 @@
 %%
 
 function tests = test_uipanel_workflow_dataExport_seg
-    if isempty(javachk('awt'))
-        tests = functiontests(localfunctions);
-    else
-        tests = functiontests({@test_skip});
-    end
+    tests = functiontests(localfunctions);
 end
 
 %% Overloaded test setup functions
@@ -77,10 +73,8 @@ function create_mock_files(size)
 end
 
 %% Actual tests
-function test_skip(testCase)
-end
-
 function test_emptydir(testCase)
+    assumeEmpty(testCase, javachk('awt'))
     handles = testCase.TestData.handles;
 
     test = true;
@@ -90,6 +84,7 @@ function test_emptydir(testCase)
 end
 
 function test_simple_2D(testCase)
+    assumeEmpty(testCase, javachk('awt'))
     imageSize = [10, 10];
     create_mock_files(imageSize)
     
@@ -102,6 +97,7 @@ function test_simple_2D(testCase)
 end
 
 function test_simple_3D(testCase)
+    assumeEmpty(testCase, javachk('awt'))
     imageSize = [10, 10, 10];
     create_mock_files(imageSize)
 
