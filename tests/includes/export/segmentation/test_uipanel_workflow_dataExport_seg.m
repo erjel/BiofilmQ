@@ -35,11 +35,13 @@ function setup(testCase)
     
     % boilerplate handles for output
     handles.uitables.files = uitable();
-    handles.java.files_javaHandle = findjobj(handles.uitables.files);
-    jscrollpane = javaObjectEDT(handles.java.files_javaHandle);
-    viewport    = javaObjectEDT(jscrollpane.getViewport);
-    jtable      = javaObjectEDT(viewport.getView);
-    handles.java.files_jtable = jtable;
+    if ~isempty(javachk('awt'))
+        handles.java.files_javaHandle = findjobj(handles.uitables.files);
+        jscrollpane = javaObjectEDT(handles.java.files_javaHandle);
+        viewport    = javaObjectEDT(jscrollpane.getViewport);
+        jtable      = javaObjectEDT(viewport.getView);
+        handles.java.files_jtable = jtable;
+    end
     
     handles.uicontrols.listbox.listbox_status = uicontrol('Style', 'text');
     
@@ -74,7 +76,6 @@ end
 
 %% Actual tests
 function test_emptydir(testCase)
-    assumeEmpty(testCase, javachk('awt'))
     handles = testCase.TestData.handles;
 
     test = true;
@@ -84,7 +85,6 @@ function test_emptydir(testCase)
 end
 
 function test_simple_2D(testCase)
-    assumeEmpty(testCase, javachk('awt'))
     imageSize = [10, 10];
     create_mock_files(imageSize)
     
@@ -97,7 +97,6 @@ function test_simple_2D(testCase)
 end
 
 function test_simple_3D(testCase)
-    assumeEmpty(testCase, javachk('awt'))
     imageSize = [10, 10, 10];
     create_mock_files(imageSize)
 

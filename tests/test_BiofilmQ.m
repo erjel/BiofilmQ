@@ -25,6 +25,7 @@ function setup(testCase)
     % setup test dir
     testCase.TestData.origPath = pwd;
     testCase.TestData.tmpFolder = ['tmpFolder' datestr(now,30)];
+    
     mkdir(testCase.TestData.tmpFolder)
     cd(testCase.TestData.tmpFolder)
     
@@ -77,11 +78,13 @@ function setup(testCase)
         
  
     handles.uitables.files = uitable();
-    handles.java.files_javaHandle = findjobj(handles.uitables.files);
-    jscrollpane = javaObjectEDT(handles.java.files_javaHandle);
-    viewport    = javaObjectEDT(jscrollpane.getViewport);
-    jtable      = javaObjectEDT(viewport.getView);
-    handles.java.files_jtable = jtable;
+    if ~isempty(javachk('awt'))
+        handles.java.files_javaHandle = findjobj(handles.uitables.files);
+        jscrollpane = javaObjectEDT(handles.java.files_javaHandle);
+        viewport    = javaObjectEDT(jscrollpane.getViewport);
+        jtable      = javaObjectEDT(viewport.getView);
+        handles.java.files_jtable = jtable;
+    end
     
     handles.uitables.files.Data = {handles.settings.lists.files_tif.name};
     handles.tableData = [];
@@ -123,7 +126,6 @@ function test__BiofilmQ__files_Callback__avail(testCase)
 end
 
 function test__BiofilmQ__files_Callback__preview_avail(testCase)
-    
     handles = testCase.TestData.handles;
     eventdata = testCase.TestData.eventdata;
 
