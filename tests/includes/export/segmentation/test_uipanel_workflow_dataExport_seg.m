@@ -35,7 +35,7 @@ function setup(testCase)
     
     % boilerplate handles for output
     handles.uitables.files = uitable();
-    if ~isempty(javachk('awt'))
+    if usejava('awt')
         handles.java.files_javaHandle = findjobj(handles.uitables.files);
         jscrollpane = javaObjectEDT(handles.java.files_javaHandle);
         viewport    = javaObjectEDT(jscrollpane.getViewport);
