@@ -141,7 +141,7 @@ function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_
     % required parameters
     handles.mainFig = figure(2);
     handles.settings.directory = pwd();
-    handles.settings.selectedFile = []; % select first item in table % init value = []
+    handles.settings.selectedFile = 2;
     handles.settings.lists.files_tif = dir('*.tif');
     handles.settings.metadataGlobal = {};
     handles.settings.showMsgs = false;
@@ -187,7 +187,7 @@ function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__avail(testCas
     % required parameters
     handles.mainFig = figure(2);
     handles.settings.directory = pwd();
-    handles.settings.selectedFile = 2; % select first item in table % init value = []
+    handles.settings.selectedFile = 2;
     handles.settings.lists.files_tif = dir('*.tif');
     handles.settings.lists.files_metadata = dir('*_metadata.mat');
     handles.settings.metadataGlobal = {};
