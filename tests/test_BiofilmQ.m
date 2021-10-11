@@ -141,7 +141,7 @@ function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_
     % required parameters
     handles.mainFig = figure(2);
     handles.settings.directory = pwd();
-    handles.settings.selectedFile = 2;
+    handles.settings.selectedFile = [];
     handles.settings.lists.files_tif = dir('*.tif');
     handles.settings.metadataGlobal = {};
     handles.settings.showMsgs = false;
@@ -172,6 +172,8 @@ function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_
         'registrationReferenceCropping',  uicontrol( ...
             'Style', 'edit', 'Tag', 'registrationReferenceCropping') ...
     );
+
+    guidata(handles.mainFig, handles);
 
     verifyError( ...
         testCase, ...
