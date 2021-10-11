@@ -1782,7 +1782,7 @@ else
     file = handles.settings.selectedFile;
 end
 
-if ~file || isempty(file)
+if isempty(file) || ~file
     msgbox('No file selected.', 'Error', 'error');
     error('pushbutton_pre_selectCropRegion_Callback:undefinedInput','No file selected.');
 end
