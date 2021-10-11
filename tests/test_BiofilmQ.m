@@ -96,7 +96,7 @@ end
 function teardown(testCase)
     cd(testCase.TestData.origPath)
     rmdir(testCase.TestData.tmpFolder, 's')
-
+    
     open_figures = findall(groot,'Type','figure');
     for i = 1:numel(open_figures)
         close(open_figures(i))
@@ -135,13 +135,6 @@ end
 
 %%pushbutton_pre_selectCropRegion_Callback
 function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_index(testCase)
-    % setup test dir
-    testCase.TestData.origPath = pwd;
-    testCase.TestData.tmpFolder = ['tmpFolder' datestr(now,30)];
-    
-    mkdir(testCase.TestData.tmpFolder)
-    cd(testCase.TestData.tmpFolder)
-    
     imageSize = [10, 10, 2];
     create_mock_files(imageSize)
 
@@ -184,17 +177,10 @@ function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_
         testCase, ...
         @() BiofilmQ('pushbutton_pre_selectCropRegion_Callback',handles.mainFig, [], guidata(handles.mainFig)), ...
         'pushbutton_pre_selectCropRegion_Callback:undefinedInput');
-    
+
 end
 
-function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__avail(testCase)
-    % setup test dir
-    testCase.TestData.origPath = pwd;
-    testCase.TestData.tmpFolder = ['tmpFolder' datestr(now,30)];
-    
-    mkdir(testCase.TestData.tmpFolder)
-    cd(testCase.TestData.tmpFolder)
-    
+function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__avail(testCase)   
     imageSize = [10, 10, 2];
     create_mock_files(imageSize)
 
