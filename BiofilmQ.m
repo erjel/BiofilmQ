@@ -1812,13 +1812,7 @@ if get(handles.uicontrols.checkbox.imageRegistration, 'Value')
 end
 
 
-
-try
-    intRange = [prctile(projection(:), 5) prctile(projection(:), 99.9)];
-catch
-    im_sorted = sort(projection(:));
-    intRange = im_sorted([round(0.05*numel(im_sorted)) round(0.99*numel(im_sorted))]);
-end
+intRange = prctile(projection(:), [5, 99.9]);
 
 if ~diff(intRange)
     intRange(1) = 0;
@@ -1829,38 +1823,39 @@ end
 
 currentCropRange = str2num(handles.uicontrols.edit.cropRange.String);
 cropRange = [];
-if handles.settings.showMsgs
-    h = figure('Name', handles.settings.lists.files_tif(file).name);
-    addIcon(h);
 
-    h_ax = axes('Parent', h);
-    imagesc(projection,'Parent', h_ax);
-    set(h_ax, 'cLim', intRange);
-    colormap(h_ax, gray(255));
-    axis(h_ax, 'tight', 'equal', 'off');
+h = figure('Name', handles.settings.lists.files_tif(file).name);
+addIcon(h);
 
-    if get(handles.uicontrols.checkbox.fixedOutputSize, 'Value') && get(handles.uicontrols.checkbox.imageRegistration, 'Value')
-        cropRange_ref = str2num(get(handles.uicontrols.edit.registrationReferenceCropping, 'String'));
-        if ~isempty(cropRange_ref)
-            rectangle('Position',cropRange_ref, 'Parent', h_ax, 'LineWidth',1.5, 'LineStyle', ':',...
-                'EdgeColor', [0.929,  0.694,  0.125])
-        end
+h_ax = axes('Parent', h);
+imagesc(projection,'Parent', h_ax);
+set(h_ax, 'cLim', intRange);
+colormap(h_ax, gray(255));
+axis(h_ax, 'tight', 'equal', 'off');
 
-        try
-            text(cropRange_ref(1), cropRange_ref(2), 'Reference frame', 'Parent', h_ax, 'Color', [0.929,  0.694,  0.125], 'BackgroundColor', 'black', 'FontSize', 8)
-        end
-    end
-
-
-    if ~isempty(currentCropRange)
-        rectangle('Position',currentCropRange, 'Parent', h_ax, 'LineWidth',0.5, 'LineStyle', '-.',...
+if get(handles.uicontrols.checkbox.fixedOutputSize, 'Value') && get(handles.uicontrols.checkbox.imageRegistration, 'Value')
+    cropRange_ref = str2num(get(handles.uicontrols.edit.registrationReferenceCropping, 'String'));
+    if ~isempty(cropRange_ref)
+        rectangle('Position',cropRange_ref, 'Parent', h_ax, 'LineWidth',1.5, 'LineStyle', ':',...
             'EdgeColor', [0.929,  0.694,  0.125])
     end
 
-    title('Please draw rectangle to crop biofilm');
     try
+        text(cropRange_ref(1), cropRange_ref(2), 'Reference frame', 'Parent', h_ax, 'Color', [0.929,  0.694,  0.125], 'BackgroundColor', 'black', 'FontSize', 8)
+    end
+end
+
+
+if ~isempty(currentCropRange)
+    rectangle('Position',currentCropRange, 'Parent', h_ax, 'LineWidth',0.5, 'LineStyle', '-.',...
+        'EdgeColor', [0.929,  0.694,  0.125])
+end
+
+title('Please draw rectangle to crop biofilm');
+try
+    if handles.settings.showMsgs
         cropRange = round(getrect);
-    end    
+    end
 end
 
 if ~isempty(cropRange)
