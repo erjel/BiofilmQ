@@ -204,8 +204,6 @@ function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__avail(testCas
         handles.java.files_jtable.changeSelection(handles.settings.selectedFile - 1,0,0,0);
     end
     
-    disp(handles.java.files_jtable.getSelectedRow()+1)
-    
     % rebuild the GUI
     handles.uicontrols.checkbox = struct( ...
         'fixedOutputSize', uicontrol( ...
