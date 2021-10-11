@@ -50,7 +50,7 @@ function setup(testCase)
     handles.dummy.panel2 = uix.HBox('Parent', handles.dummy.panel);
     
     handles.uicontrols.checkbox = struct(...
-         'displayAllChannels', uicontrol('Style', 'checkbox', 'Tag',  'displayAllChannels'), ...
+        'displayAllChannels', uicontrol('Style', 'checkbox', 'Tag',  'displayAllChannels'), ...
         'displayAlignedImage', uicontrol('Style', 'checkbox', 'Tag',  'displayAlignedImage'), ...
         'scaleUp', uicontrol('Style', 'checkbox', 'Tag',  'scaleUp'), ...
         'imageRegistration', uicontrol('Style', 'checkbox', 'Tag',  'imageRegistration'));
@@ -116,6 +116,7 @@ function create_mock_files(size)
 end
 
 %% Actual tests
+%%files_Callback
 function test__BiofilmQ__files_Callback__avail(testCase)
     handles = testCase.TestData.handles;
     eventdata = testCase.TestData.eventdata;
@@ -131,3 +132,113 @@ function test__BiofilmQ__files_Callback__preview_avail(testCase)
     
     verifyNotEmpty(testCase, handles.axes.axes_preview.Children)
 end    
+
+%%pushbutton_pre_selectCropRegion_Callback
+function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_index(testCase)
+    % setup test dir
+    testCase.TestData.origPath = pwd;
+    testCase.TestData.tmpFolder = ['tmpFolder' datestr(now,30)];
+    
+    mkdir(testCase.TestData.tmpFolder)
+    cd(testCase.TestData.tmpFolder)
+    
+    imageSize = [10, 10, 2];
+    create_mock_files(imageSize)
+
+    % required parameters
+    handles.mainFig = figure(2);
+    handles.settings.directory = pwd();
+    handles.settings.selectedFile = []; % select first item in table % init value = []
+    handles.settings.lists.files_tif = dir('*.tif');
+    handles.settings.metadataGlobal = {};
+    handles.settings.showMsgs = false;
+    
+    
+    handles.uitables.files = uitable();
+    if usejava('awt')
+        handles.java.files_javaHandle = findjobj(handles.uitables.files);
+        jscrollpane = javaObjectEDT(handles.java.files_javaHandle);
+        viewport    = javaObjectEDT(jscrollpane.getViewport);
+        jtable      = javaObjectEDT(viewport.getView);
+        handles.java.files_jtable = jtable;
+    end
+    
+    % rebuild the GUI
+    handles.uicontrols.checkbox = struct( ...
+        'fixedOutputSize', uicontrol( ...
+            'Style', 'checkbox', 'Tag',  'fixedOutputSize'), ...
+        'cropRangeInterpolated', uicontrol( ...
+            'Style', 'checkbox', 'Tag',  'cropRangeInterpolated'), ...
+        'imageRegistration', uicontrol( ...
+            'Style', 'checkbox', 'Tag',  'imageRegistration') ...
+    );
+
+    handles.uicontrols.edit = struct( ...
+        'cropRange', uicontrol( ...
+            'Style', 'edit', 'Tag',  'cropRange'), ...
+        'registrationReferenceCropping',  uicontrol( ...
+            'Style', 'edit', 'Tag', 'registrationReferenceCropping') ...
+    );
+
+    verifyError( ...
+        testCase, ...
+        @() BiofilmQ('pushbutton_pre_selectCropRegion_Callback',handles.mainFig, [], guidata(handles.mainFig)), ...
+        'pushbutton_pre_selectCropRegion_Callback:undefinedInput');
+    
+end
+
+function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__avail(testCase)
+    % setup test dir
+    testCase.TestData.origPath = pwd;
+    testCase.TestData.tmpFolder = ['tmpFolder' datestr(now,30)];
+    
+    mkdir(testCase.TestData.tmpFolder)
+    cd(testCase.TestData.tmpFolder)
+    
+    imageSize = [10, 10, 2];
+    create_mock_files(imageSize)
+
+    % required parameters
+    handles.mainFig = figure(2);
+    handles.settings.directory = pwd();
+    handles.settings.selectedFile = 2; % select first item in table % init value = []
+    handles.settings.lists.files_tif = dir('*.tif');
+    handles.settings.lists.files_metadata = dir('*_metadata.mat');
+    handles.settings.metadataGlobal = {};
+    handles.settings.showMsgs = false;
+    
+    
+    handles.uitables.files = uitable('Data', magic(4)); % need to fill it with fake data
+    if usejava('awt')
+        handles.java.files_javaHandle = findjobj(handles.uitables.files);
+        jscrollpane = javaObjectEDT(handles.java.files_javaHandle);
+        viewport    = javaObjectEDT(jscrollpane.getViewport);
+        jtable      = javaObjectEDT(viewport.getView);
+        handles.java.files_jtable = jtable;
+        handles.java.files_jtable.changeSelection(handles.settings.selectedFile - 1,0,0,0);
+    end
+    
+    disp(handles.java.files_jtable.getSelectedRow()+1)
+    
+    % rebuild the GUI
+    handles.uicontrols.checkbox = struct( ...
+        'fixedOutputSize', uicontrol( ...
+            'Style', 'checkbox', 'Tag',  'fixedOutputSize'), ...
+        'cropRangeInterpolated', uicontrol( ...
+            'Style', 'checkbox', 'Tag',  'cropRangeInterpolated'), ...
+        'imageRegistration', uicontrol( ...
+            'Style', 'checkbox', 'Tag',  'imageRegistration') ...
+    );
+
+    handles.uicontrols.edit = struct( ...
+        'cropRange', uicontrol( ...
+            'Style', 'edit', 'Tag',  'cropRange'), ...
+        'registrationReferenceCropping',  uicontrol( ...
+            'Style', 'edit', 'Tag', 'registrationReferenceCropping') ...
+    );
+
+    guidata(handles.mainFig, handles);
+    
+    BiofilmQ('pushbutton_pre_selectCropRegion_Callback',handles.mainFig, [], guidata(handles.mainFig));
+    
+end

@@ -1779,10 +1779,16 @@ end
 
 
 function pushbutton_pre_selectCropRegion_Callback(hObject, eventdata, handles)
-file = handles.java.files_jtable.getSelectedRow()+1;
+
+if usejava('awt')
+    file = handles.java.files_jtable.getSelectedRow()+1;
+else
+    file = handles.settings.selectedFile;
+end
+
 if ~file
     msgbox('No file selected.', 'Error', 'error');
-    return;
+    error('pushbutton_pre_selectCropRegion_Callback:undefinedInput','No file selected.');
 end
 displayStatus(handles, ['Cropping image "',handles.settings.lists.files_tif(file).name, '"'], 'black');
 
@@ -1790,6 +1796,7 @@ displayStatus(handles, ['Cropping image "',handles.settings.lists.files_tif(file
 try
     metadata = handles.settings.metadataGlobal{file};
 catch
+    files = handles.settings.lists;
     metadata_file = dir(fullfile(handles.settings.directory, files.files_metadata(file).name));
     if ~isempty(metadata_file)
         metadata = load(fullfile(handles.settings.directory,metadata_file.name));
@@ -1808,8 +1815,7 @@ if get(handles.uicontrols.checkbox.imageRegistration, 'Value')
     projection = performImageAlignment2D(projection, metadata);
 end
 
-h = figure('Name', handles.settings.lists.files_tif(file).name);
-addIcon(h);
+
 
 try
     intRange = [prctile(projection(:), 5) prctile(projection(:), 99.9)];
@@ -1825,35 +1831,40 @@ if ~diff(intRange)
     end
 end
 
-h_ax = axes('Parent', h);
-imagesc(projection,'Parent', h_ax);
-set(h_ax, 'cLim', intRange);
-colormap(h_ax, gray(255));
-axis(h_ax, 'tight', 'equal', 'off');
+currentCropRange = str2num(handles.uicontrols.edit.cropRange.String);
+cropRange = [];
+if handles.settings.showMsgs
+    h = figure('Name', handles.settings.lists.files_tif(file).name);
+    addIcon(h);
 
-if get(handles.uicontrols.checkbox.fixedOutputSize, 'Value') && get(handles.uicontrols.checkbox.imageRegistration, 'Value')
-    cropRange_ref = str2num(get(handles.uicontrols.edit.registrationReferenceCropping, 'String'));
-    if ~isempty(cropRange_ref)
-        rectangle('Position',cropRange_ref, 'Parent', h_ax, 'LineWidth',1.5, 'LineStyle', ':',...
+    h_ax = axes('Parent', h);
+    imagesc(projection,'Parent', h_ax);
+    set(h_ax, 'cLim', intRange);
+    colormap(h_ax, gray(255));
+    axis(h_ax, 'tight', 'equal', 'off');
+
+    if get(handles.uicontrols.checkbox.fixedOutputSize, 'Value') && get(handles.uicontrols.checkbox.imageRegistration, 'Value')
+        cropRange_ref = str2num(get(handles.uicontrols.edit.registrationReferenceCropping, 'String'));
+        if ~isempty(cropRange_ref)
+            rectangle('Position',cropRange_ref, 'Parent', h_ax, 'LineWidth',1.5, 'LineStyle', ':',...
+                'EdgeColor', [0.929,  0.694,  0.125])
+        end
+
+        try
+            text(cropRange_ref(1), cropRange_ref(2), 'Reference frame', 'Parent', h_ax, 'Color', [0.929,  0.694,  0.125], 'BackgroundColor', 'black', 'FontSize', 8)
+        end
+    end
+
+
+    if ~isempty(currentCropRange)
+        rectangle('Position',currentCropRange, 'Parent', h_ax, 'LineWidth',0.5, 'LineStyle', '-.',...
             'EdgeColor', [0.929,  0.694,  0.125])
     end
-    
+
+    title('Please draw rectangle to crop biofilm');
     try
-        text(cropRange_ref(1), cropRange_ref(2), 'Reference frame', 'Parent', h_ax, 'Color', [0.929,  0.694,  0.125], 'BackgroundColor', 'black', 'FontSize', 8)
-    end
-end
-
-currentCropRange = str2num(handles.uicontrols.edit.cropRange.String);
-if ~isempty(currentCropRange)
-    rectangle('Position',currentCropRange, 'Parent', h_ax, 'LineWidth',0.5, 'LineStyle', '-.',...
-        'EdgeColor', [0.929,  0.694,  0.125])
-end
-
-title('Please draw rectangle to crop biofilm');
-try
-    cropRange = round(getrect);
-catch
-    cropRange = [];
+        cropRange = round(getrect);
+    end    
 end
 
 if ~isempty(cropRange)
@@ -1868,7 +1879,11 @@ if ~isempty(cropRange)
     end
     
     if (cropRange(1) > size(projection,2)) || (cropRange(2) > size(projection,1))
-        uiwait(msgbox('The crop rectangle has to be confined by the image dimensions!', 'Error', 'error', 'modal'));
+        if handles.settings.showMsgs
+            uiwait(msgbox('The crop rectangle has to be confined by the image dimensions!', 'Error', 'error', 'modal'));
+        else
+            warning('The crop rectangle has to be confined by the image dimensions!')
+        end
         try
             delete(h);
         end
