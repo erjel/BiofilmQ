@@ -882,12 +882,8 @@ if fileType>1 && fileType<6
         delete(get(handles.axes.axes_preview, 'Children'));
         
         if size(im, 3) == 1
-            try
-                intRange = [prctile(im(:), 5) prctile(im(:), 99.9)];
-            catch
-                im_sorted = sort(im(:));
-                intRange = im_sorted([round(0.05*numel(im_sorted)) round(0.99*numel(im_sorted))]);
-            end
+            intRange = prctile(im(:), [5, 99.9]);
+            
             if ~diff(intRange)
                 intRange(1) = 0;
                 if ~intRange(2)
