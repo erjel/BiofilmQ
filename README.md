@@ -25,7 +25,7 @@ deploytool -build BiofilmQ_Win10.prj
 The files are created in a new folder in `deployment/BiofilmQ_Win10`
 
 ### mcc
-i.e. in a PowerShell promt
+i.e. in a PowerShell prompt
 ```PowerShell
 cd deployment
 mkdir build
