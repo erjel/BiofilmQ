@@ -3,5 +3,5 @@
 ```
 git clone https://github.com/erjel/BiofilmQ.git
 cd BiofilmQ
-matlab -nosplash -noawt -wait -batch "addpath(pwd); addpath(genpath('tests')); runUnitTests('IncludeSubfolders', true)"
+matlab -nosplash -noawt -wait -batch "addpath(pwd), addpath(genpath('includes')), results = runtests('IncludeSubfolders', true), assertSuccess(results);"
 ```

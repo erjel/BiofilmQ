@@ -1,4 +1,4 @@
-% Copyright (c) 2021 Eric Jelli (GitHub: @erjel)
+% Copyright (c) 2022 Eric Jelli (GitHub: @erjel)
 %
 % This program is free software: you can redistribute it and/or modify
 % it under the terms of the GNU General Public License as published by
@@ -29,7 +29,31 @@ function setup(testCase)
     
     imageSize = [10, 10, 2];
     create_mock_files(imageSize)
+end
+
+function teardown(testCase)
+    cd(testCase.TestData.origPath)
+    rmdir(testCase.TestData.tmpFolder, 's')
     
+    open_figures = findall(groot,'Type','figure');
+    for i = 1:numel(open_figures)
+        close(open_figures(i))
+    end
+end
+
+%% Custom helper function
+function create_mock_files(size)
+    % create mock files
+    for i = str2num('1:2')
+        img = randi(2, size) - 1;
+        metadata = struct([]);
+        save(sprintf('test%d_metadata.mat', i), 'metadata');
+        verbose = false;
+        imwrite3D(img, sprintf('test%d.tif', i), 'uint8', verbose);
+    end
+end
+
+function testCase = mock_handles__BiofilmQ__files_Callback(testCase)
     % mock eventdata
     eventdata.Indices = [1];
     
@@ -67,12 +91,17 @@ function setup(testCase)
         'gridSpacing', uicontrol('Style', 'edit', 'Tag', 'gridSpacing'), ...
         'topHatSize', uicontrol('Style', 'edit', 'Tag', 'topHatSize'));
     
+    handles.uicontrols.listbox = struct( ...
+        'listbox_status', uicontrol('Style', 'listbox'));
+    
     handles.uicontrols.popupmenu.popupmenu_fileType = uicontrol( ...
         'Style', 'popupmenu', 'Value', 2, 'Tag', 'fileType');
     
     handles.uicontrols.text = struct( ...
         'text_fileDetails', uicontrol('Style', 'text', 'Parent', handles.dummy.panel), ...
         'text_parameterUnitConversion', uicontrol('Style', 'text'));
+    
+
         
  
     handles.uitables.files = uitable();
@@ -91,33 +120,13 @@ function setup(testCase)
     
     testCase.TestData.handles = handles;
     testCase.TestData.eventdata = eventdata;
-end
-
-function teardown(testCase)
-    cd(testCase.TestData.origPath)
-    rmdir(testCase.TestData.tmpFolder, 's')
-    
-    open_figures = findall(groot,'Type','figure');
-    for i = 1:numel(open_figures)
-        close(open_figures(i))
-    end
-end
-
-%% Custom helper function
-function create_mock_files(size)
-    % create mock files
-    for i = str2num('1:2')
-        img = randi(2, size) - 1;
-        metadata = struct([]);
-        save(sprintf('test%d_metadata.mat', i), 'metadata');
-        verbose = false;
-        imwrite3D(img, sprintf('test%d.tif', i), 'uint8', verbose);
-    end
+    return
 end
 
 %% Actual tests
 %%files_Callback
 function test__BiofilmQ__files_Callback__avail(testCase)
+    testCase = mock_handles__BiofilmQ__files_Callback(testCase);
     handles = testCase.TestData.handles;
     eventdata = testCase.TestData.eventdata;
     
@@ -125,6 +134,7 @@ function test__BiofilmQ__files_Callback__avail(testCase)
 end
 
 function test__BiofilmQ__files_Callback__preview_avail(testCase)
+    testCase = mock_handles__BiofilmQ__files_Callback(testCase);
     handles = testCase.TestData.handles;
     eventdata = testCase.TestData.eventdata;
 
@@ -135,6 +145,9 @@ end
 
 %%pushbutton_pre_selectCropRegion_Callback
 function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_index(testCase)
+    testCase = mock_handles__BiofilmQ__files_Callback(testCase); % TODO(erjel)!
+
+
     imageSize = [10, 10, 2];
     create_mock_files(imageSize)
 
@@ -182,7 +195,8 @@ function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_
 
 end
 
-function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__avail(testCase)   
+function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__avail(testCase)
+    testCase = mock_handles__BiofilmQ__files_Callback(testCase); % TODO(erjel)!
     imageSize = [10, 10, 2];
     create_mock_files(imageSize)
 
