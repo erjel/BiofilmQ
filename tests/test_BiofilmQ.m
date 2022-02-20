@@ -141,7 +141,23 @@ function test__BiofilmQ__files_Callback__preview_avail(testCase)
     BiofilmQ('files_Callback',handles.mainFig, eventdata, guidata(handles.mainFig));
     
     verifyNotEmpty(testCase, handles.axes.axes_preview.Children)
-end    
+end
+
+function test__BiofilmQ__files_Callback__all_ch(testCase)
+    testCase = mock_handles__BiofilmQ__files_Callback(testCase);
+    handles = testCase.TestData.handles;
+    eventdata = testCase.TestData.eventdata;
+    
+    handles.settings.channelColors = [1 0 0; 0 1 0; 0 0 1; 1 1 0; 0 1 1; 1 0 1];
+    handles.uicontrols.checkbox.displayAllChannels.Value = true;
+    % filetype.Value == 2 => filetype = files_tif
+    handles.uicontrols.popupmenu.popupmenu_fileType = uicontrol( ...
+        'Style', 'popupmenu', 'Value', 2, 'Tag', 'fileType');
+
+    guidata(handles.mainFig, handles);
+    
+    BiofilmQ('files_Callback',handles.mainFig, eventdata, guidata(handles.mainFig));
+end
 
 %%pushbutton_pre_selectCropRegion_Callback
 function test__BiofilmQ__pushbutton_pre_selectCropRegion_Callback__missing_file_index(testCase)
