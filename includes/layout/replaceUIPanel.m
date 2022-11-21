@@ -1746,6 +1746,9 @@ switch panelName
             handles.uicontrols.pushbutton.importCustomTiffPushbutton.Callback = ...
                 @(hObject,eventdata)BiofilmQ('importCustomTiffPushbutton_Callback',hObject,eventdata,guidata(hObject));
         end
+    otherwise
+        h = uix.HBox('Parent', handles.layout.uipanels.(panelName).Parent, 'Padding', 2*padding, 'Spacing', spacing);
+        handles.layout.uipanels.(panelName).Children.Parent = h;
 end
 
 try

@@ -372,6 +372,7 @@ handles = populateTabs(handles, 'uipanel_workflow_segmentation_mergeAndTransfer'
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.25)
 
+handles.layout.uipanels.uipanel_workflow_dataExport_seg = uipanel_workflow_dataExport_seg(handles);
 
 handles.layout.tabs.workflow_exportTabs = uitabgroup('Parent', handles.layout.uipanels.uipanel_workflow_dataExport_methodTabs.Parent, 'TabLocation', 'top', 'units', 'characters', 'Position', get(handles.layout.uipanels.uipanel_workflow_dataExport_methodTabs, 'Position'));
 delete(handles.layout.uipanels.uipanel_workflow_dataExport_methodTabs)
@@ -379,6 +380,7 @@ delete(handles.layout.uipanels.uipanel_workflow_dataExport_methodTabs)
 handles = populateTabs(handles, 'uipanel_workflow_dataExport_vtk','workflow_exportTabs');
 handles = populateTabs(handles, 'uipanel_workflow_dataExport_fcs','workflow_exportTabs');
 handles = populateTabs(handles, 'uipanel_workflow_dataExport_csv','workflow_exportTabs');
+handles = populateTabs(handles, 'uipanel_workflow_dataExport_seg','workflow_exportTabs');
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.3)
 
@@ -476,6 +478,7 @@ set(handles.splashScreenHandle,'ProgressRatio', 0.6)
 handles = replaceUIPanel(handles, 'uipanel_workflow_dataExport');
 handles = replaceUIPanel(handles, 'uipanel_workflow_dataExport_vtk');
 handles = replaceUIPanel(handles, 'uipanel_workflow_dataExport_fcs');
+handles = replaceUIPanel(handles, 'uipanel_workflow_dataExport_seg');
 
 set(handles.splashScreenHandle,'ProgressRatio', 0.65)
 
@@ -879,12 +882,8 @@ if fileType>1 && fileType<6
         delete(get(handles.axes.axes_preview, 'Children'));
         
         if size(im, 3) == 1
-            try
-                intRange = [prctile(im(:), 5) prctile(im(:), 99.9)];
-            catch
-                im_sorted = sort(im(:));
-                intRange = im_sorted([round(0.05*numel(im_sorted)) round(0.99*numel(im_sorted))]);
-            end
+            intRange = prctile(im(:), [5, 99.9]);
+            
             if ~diff(intRange)
                 intRange(1) = 0;
                 if ~intRange(2)
@@ -1776,10 +1775,16 @@ end
 
 
 function pushbutton_pre_selectCropRegion_Callback(hObject, eventdata, handles)
-file = handles.java.files_jtable.getSelectedRow()+1;
-if ~file
+
+if usejava('awt')
+    file = handles.java.files_jtable.getSelectedRow()+1;
+else
+    file = handles.settings.selectedFile;
+end
+
+if isempty(file) || ~file
     msgbox('No file selected.', 'Error', 'error');
-    return;
+    error('pushbutton_pre_selectCropRegion_Callback:undefinedInput','No file selected.');
 end
 displayStatus(handles, ['Cropping image "',handles.settings.lists.files_tif(file).name, '"'], 'black');
 
@@ -1787,6 +1792,7 @@ displayStatus(handles, ['Cropping image "',handles.settings.lists.files_tif(file
 try
     metadata = handles.settings.metadataGlobal{file};
 catch
+    files = handles.settings.lists;
     metadata_file = dir(fullfile(handles.settings.directory, files.files_metadata(file).name));
     if ~isempty(metadata_file)
         metadata = load(fullfile(handles.settings.directory,metadata_file.name));
@@ -1805,15 +1811,8 @@ if get(handles.uicontrols.checkbox.imageRegistration, 'Value')
     projection = performImageAlignment2D(projection, metadata);
 end
 
-h = figure('Name', handles.settings.lists.files_tif(file).name);
-addIcon(h);
 
-try
-    intRange = [prctile(projection(:), 5) prctile(projection(:), 99.9)];
-catch
-    im_sorted = sort(projection(:));
-    intRange = im_sorted([round(0.05*numel(im_sorted)) round(0.99*numel(im_sorted))]);
-end
+intRange = prctile(projection(:), [5, 99.9]);
 
 if ~diff(intRange)
     intRange(1) = 0;
@@ -1821,6 +1820,12 @@ if ~diff(intRange)
         intRange(2) = 1;
     end
 end
+
+currentCropRange = str2num(handles.uicontrols.edit.cropRange.String);
+cropRange = [];
+
+h = figure('Name', handles.settings.lists.files_tif(file).name);
+addIcon(h);
 
 h_ax = axes('Parent', h);
 imagesc(projection,'Parent', h_ax);
@@ -1834,13 +1839,13 @@ if get(handles.uicontrols.checkbox.fixedOutputSize, 'Value') && get(handles.uico
         rectangle('Position',cropRange_ref, 'Parent', h_ax, 'LineWidth',1.5, 'LineStyle', ':',...
             'EdgeColor', [0.929,  0.694,  0.125])
     end
-    
+
     try
         text(cropRange_ref(1), cropRange_ref(2), 'Reference frame', 'Parent', h_ax, 'Color', [0.929,  0.694,  0.125], 'BackgroundColor', 'black', 'FontSize', 8)
     end
 end
 
-currentCropRange = str2num(handles.uicontrols.edit.cropRange.String);
+
 if ~isempty(currentCropRange)
     rectangle('Position',currentCropRange, 'Parent', h_ax, 'LineWidth',0.5, 'LineStyle', '-.',...
         'EdgeColor', [0.929,  0.694,  0.125])
@@ -1848,9 +1853,9 @@ end
 
 title('Please draw rectangle to crop biofilm');
 try
-    cropRange = round(getrect);
-catch
-    cropRange = [];
+    if handles.settings.showMsgs
+        cropRange = round(getrect);
+    end
 end
 
 if ~isempty(cropRange)
@@ -1865,7 +1870,11 @@ if ~isempty(cropRange)
     end
     
     if (cropRange(1) > size(projection,2)) || (cropRange(2) > size(projection,1))
-        uiwait(msgbox('The crop rectangle has to be confined by the image dimensions!', 'Error', 'error', 'modal'));
+        if handles.settings.showMsgs
+            uiwait(msgbox('The crop rectangle has to be confined by the image dimensions!', 'Error', 'error', 'modal'));
+        else
+            warning('The crop rectangle has to be confined by the image dimensions!')
+        end
         try
             delete(h);
         end
